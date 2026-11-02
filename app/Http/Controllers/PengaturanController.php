@@ -6,12 +6,15 @@ use App\Models\Anggaran;
 use App\Models\Kantong;
 use App\Models\Transaksi;
 use App\Models\TransaksiBerulang;
+use App\Models\User;
 use Illuminate\View\View;
 
 class PengaturanController extends Controller
 {
     public function index(): View
     {
+        $penggunaSaatIni = request()->user();
+
         return view('pengaturan', [
             'jumlahTransaksi' => Transaksi::query()->count(),
             'jumlahKantong' => Kantong::query()->count(),
@@ -20,6 +23,10 @@ class PengaturanController extends Controller
             'adminTokenSiap' => filled(config('services.hermes.token')),
             'baseUrl' => url('/api'),
             'demoMode' => (bool) config('app.demo_mode'),
+            'bolehKelolaPengguna' => (bool) $penggunaSaatIni?->is_admin,
+            'pengguna' => $penggunaSaatIni?->is_admin
+                ? User::query()->orderBy('name')->get(['id', 'name', 'email', 'pencatat', 'is_admin'])
+                : collect(),
         ]);
     }
 }

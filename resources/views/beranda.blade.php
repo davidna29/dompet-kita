@@ -161,7 +161,7 @@
                                         <span class="shrink-0 font-mono text-[10px] {{ $row['status'] === 'lewat' ? 'text-tomato' : 'text-ochre' }}">{{ $row['persen'] }}%</span>
                                     </div>
                                     <div class="progress mt-1.5">
-                                        <div class="progress__bar {{ $row['status'] === 'lewat' ? 'progress__bar--lewat' : ($row['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="width: {{ min(100, $row['persen']) }}%"></div>
+                                        <div class="progress__bar {{ $row['status'] === 'lewat' ? 'progress__bar--lewat' : ($row['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="--progress: {{ min(100, $row['persen']) / 100 }}"></div>
                                     </div>
                                     <p class="mt-1 text-[10px] text-muted">{{ $row['sisa'] >= 0 ? 'Sisa '.rupiah($row['sisa']) : 'Lewat '.rupiah(abs($row['sisa'])) }}</p>
                                 </a>

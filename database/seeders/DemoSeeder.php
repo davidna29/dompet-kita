@@ -25,12 +25,12 @@ class DemoSeeder extends Seeder
 
         $david = User::updateOrCreate(
             ['email' => 'david@dompetkita.test'],
-            ['name' => 'David NA', 'pencatat' => 'David NA', 'password' => Hash::make('password')]
+            ['name' => 'David NA', 'pencatat' => 'David NA', 'password' => Hash::make('password'), 'is_admin' => true]
         );
 
         $nurul = User::updateOrCreate(
             ['email' => 'nurul@dompetkita.test'],
-            ['name' => 'Nurul Azizah', 'pencatat' => 'Nurul Azizah', 'password' => Hash::make('password')]
+            ['name' => 'Nurul Azizah', 'pencatat' => 'Nurul Azizah', 'password' => Hash::make('password'), 'is_admin' => true]
         );
 
         $mulai = today()->startOfMonth()->subMonths(5);

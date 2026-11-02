@@ -2,8 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Transaksi;
-use App\Models\User;
+use App\Models\TransaksiBerulang;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -61,6 +60,21 @@ class ApiTransaksiTest extends TestCase
         $this->assertDatabaseCount('transaksi', 1);
     }
 
+    public function test_api_metode_kantong_tetap_teks_bebas_sampai_hermes_menyinkronkan_daftar(): void
+    {
+        $response = $this->api()->postJson('/api/transaksi', [
+            'tanggal' => '2026-11-02',
+            'jenis' => 'keluar',
+            'kategori' => 'Makanan',
+            'jumlah' => 35000,
+            'pencatat' => 'David NA',
+            'metode' => 'Shoppe',
+            'sumber' => 'telegram',
+        ])->assertCreated();
+
+        $this->assertSame('Shoppe', $response->json('data.metode'));
+    }
+
     public function test_mutasi_wajib_punya_asal_dan_tujuan_berbeda(): void
     {
         $data = [
@@ -113,6 +127,59 @@ class ApiTransaksiTest extends TestCase
         $this->assertSoftDeleted('transaksi', ['id' => $id]);
     }
 
+    public function test_put_tanpa_perubahan_tidak_menggeser_updated_at(): void
+    {
+        $data = [
+            'tanggal' => '2026-11-02',
+            'jenis' => 'keluar',
+            'kategori' => 'Makanan',
+            'jumlah' => 35000,
+            'pencatat' => 'David NA',
+            'sumber' => 'telegram',
+        ];
+
+        $dibuat = $this->api()->postJson('/api/transaksi', $data)->assertCreated();
+        $id = $dibuat->json('data.id');
+        $updatedAtAwal = $dibuat->json('data.updated_at');
+
+        Carbon::setTestNow(Carbon::parse($updatedAtAwal, 'Asia/Jakarta')->addMinute());
+
+        try {
+            $tetap = $this->api()->putJson('/api/transaksi/'.$id, ['jumlah' => 35000])
+                ->assertOk()
+                ->json('data.updated_at');
+        } finally {
+            Carbon::setTestNow();
+        }
+
+        $this->assertSame($updatedAtAwal, $tetap);
+    }
+
+    public function test_delete_berulang_pada_baris_soft_deleted_idempoten(): void
+    {
+        $data = [
+            'tanggal' => '2026-11-02',
+            'jenis' => 'keluar',
+            'kategori' => 'Makanan',
+            'jumlah' => 35000,
+            'pencatat' => 'David NA',
+            'sumber' => 'telegram',
+        ];
+
+        $dibuat = $this->api()->postJson('/api/transaksi', $data)->assertCreated();
+        $id = $dibuat->json('data.id');
+        $hapusPertama = $this->api()->deleteJson('/api/transaksi/'.$id)->assertOk();
+        $deletedAt = $hapusPertama->json('data.deleted_at');
+
+        $this->api()->deleteJson('/api/transaksi/'.$id)
+            ->assertOk()
+            ->assertJsonPath('data.deleted_at', $deletedAt);
+
+        $this->assertDatabaseCount('transaksi', 1);
+        $this->assertDatabaseCount('transaksi_riwayat', 2);
+        $this->assertDatabaseHas('transaksi_riwayat', ['transaksi_id' => $id, 'aksi' => 'dihapus']);
+    }
+
     public function test_list_memakai_amplop_data_next_offset_dan_server_time(): void
     {
         $this->api()->getJson('/api/transaksi?limit=2')
@@ -143,7 +210,7 @@ class ApiTransaksiTest extends TestCase
 
     public function test_konfirmasi_pengingat_api_idempoten(): void
     {
-        $jadwal = \App\Models\TransaksiBerulang::create([
+        $jadwal = TransaksiBerulang::create([
             'nama' => 'Listrik PLN',
             'kategori' => 'Tagihan',
             'jumlah' => 480000,

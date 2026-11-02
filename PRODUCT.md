@@ -14,7 +14,7 @@ Laravel 13 monolith (UI + API), PHP 8.5 target (minimum 8.3; development machine
 
 - **David NA** and **Nurul Azizah** — a married couple recording their household finances from their phones. They log expenses through Telegram chat with the Hermes agent, and want to look up, add, correct, and delete records visually without opening a terminal. They are not accountants; the interface must stay legible under everyday mobile conditions.
 - **Hermes (STB agent)** — an automated agent running on a set-top box that parses Telegram messages, pushes transactions to the API, pulls updates before scheduled reports, and sends reminders. It is a machine user with write access through a separate admin token.
-- Two separate UI accounts (David, Nurul) map the `pencatat` field automatically from the logged-in account. Confirmed for this build.
+- David NA and Nurul Azizah are the initial UI account managers. They can add household members; new accounts are regular members and map `pencatat` automatically from the logged-in account.
 
 ## Product Purpose
 
@@ -36,11 +36,11 @@ A two-channel family ledger: conversational capture through Hermes with an idemp
 
 ## Capabilities and Constraints
 
-**Must (built now):** login with rate limiting (5 attempts/minute/IP), transaction list with filters, create/edit/soft-delete, period summary, Bearer-token API for the STB, CSV import path, last-write-wins conflict handling, server-owned timestamps.
+**Must (built now):** login with rate limiting (5 attempts/minute/IP), admin-managed household accounts, transaction list with filters, create/edit/soft-delete, period summary, Bearer-token API for the STB, CSV import path, last-write-wins conflict handling, server-owned timestamps.
 
-**Should (built now):** CSV export, dashboard with charts, category budgets, recurring transactions and bill reminders confirmed by the user, category icons/colors/order, change history, pocket balances, PWA install + dark mode, on-demand pull support.
+**Should (built now):** CSV export, dashboard with charts, category budgets, recurring transactions and bill reminders confirmed by the user, category icons/colors/order and type-aware income suggestions, change history, managed/archived pockets with safe rename, pocket balances, PWA install + Olive/Pink Linen light and dark themes, on-demand pull support.
 
-**Hard data rules:** `jenis` only `masuk`/`keluar`; Mutasi is `keluar` + `kategori=Mutasi`; spending totals exclude Mutasi; `jumlah` is a positive integer; category is free text (max 50 chars, normalized trim + first letter capital); soft delete only; `client_key` unique and idempotent; `updated_at` set by the server; no new `jenis` values, no formatted amount strings, no permanent deletion from the UI, no offline-first UI.
+**Hard data rules:** `jenis` only `masuk`/`keluar`; Mutasi is `keluar` + `kategori=Mutasi`; spending totals exclude Mutasi; `jumlah` is a positive integer; category is free text (max 50 chars, normalized trim + first letter capital); soft delete only; `client_key` unique and idempotent; `updated_at` set by the server; pocket rename updates historical references transactionally; archive only zero-balance pockets with no active schedules; new members are not admins; no new `jenis` values, no formatted amount strings, no permanent deletion from the UI, no offline-first UI.
 
 **API contract:** `GET /api/health`, `GET /api/transaksi?since=&limit=&offset=` including soft-deleted rows, `POST /api/transaksi` idempotent on `client_key`, `PUT/DELETE /api/transaksi/{id}`. JSON responses, errors as HTTP status + `{error: "pesan singkat Bahasa Indonesia"}`. `since`/`server_time` are `YYYY-MM-DDTHH:MM:SS` in Asia/Jakarta without offset. List envelope `{data, next_offset, server_time}`. POST/PUT/DELETE return the full row; repeated POST returns the existing row with 200. Stage 2 adds `GET /api/kantong`, `/api/anggaran`, `/api/pengingat`, `POST /api/pengingat/{id}/konfirmasi`.
 

@@ -7,6 +7,7 @@ use App\Models\TransaksiRiwayat;
 use App\Models\User;
 use App\Support\JumlahParser;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -38,7 +39,7 @@ class TransaksiService
 
                 return $transaksi;
             });
-        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException $e) {
             if (! empty($data['client_key'])) {
                 $lama = Transaksi::withTrashed()->where('client_key', $data['client_key'])->first();
                 if ($lama !== null) {
@@ -82,8 +83,6 @@ class TransaksiService
                     $awal,
                     $this->snapshot($transaksi)
                 );
-            } else {
-                $transaksi->touch();
             }
 
             return $transaksi->refresh();

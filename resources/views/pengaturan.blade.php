@@ -52,7 +52,22 @@
 
             <article class="paper p-5">
                 <h2 class="font-display text-lg font-semibold">Tampilan</h2>
-                <p class="mt-1 text-sm text-muted">Papan mengikuti preferensi perangkat, lalu pilihan yang tersimpan di browser ini.</p>
+                <p class="mt-1 text-sm text-muted">Pilih palet papan dan mode terang atau gelap. Pilihan tersimpan di browser ini.</p>
+                <fieldset class="mt-4">
+                    <legend class="label">Palet warna</legend>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <label data-palette-choice class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-line px-3 text-sm font-semibold transition-colors">
+                            <input type="radio" name="dompet-palet" value="olive" data-palette-select class="size-4 accent-olive">
+                            <span class="size-3 rounded-full bg-olive" aria-hidden="true"></span>
+                            <span>Olive</span>
+                        </label>
+                        <label data-palette-choice class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-line px-3 text-sm font-semibold transition-colors">
+                            <input type="radio" name="dompet-palet" value="rose" data-palette-select class="size-4 accent-olive">
+                            <span class="size-3 rounded-full bg-action" aria-hidden="true"></span>
+                            <span>Pink Linen</span>
+                        </label>
+                    </div>
+                </fieldset>
                 <div class="mt-4 flex flex-wrap items-center gap-2">
                     <button type="button" data-theme-toggle class="btn btn-soft btn-sm w-fit">
                         <x-icon name="sun" class="theme-icon-sun size-4" />
@@ -70,6 +85,60 @@
                 </div>
             </article>
         </section>
+
+        @if($bolehKelolaPengguna)
+            <section class="grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
+                <article class="paper p-5">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h2 class="font-display text-lg font-semibold">Akun keluarga</h2>
+                            <p class="mt-1 text-sm text-muted">David dan Nurul dapat mengelola akun. Anggota baru hanya dapat mencatat dan melihat data keluarga.</p>
+                        </div>
+                        <span class="tag tag--netral">{{ $pengguna->count() }} akun</span>
+                    </div>
+                    <div class="mt-4 divide-y divide-line border-t border-line">
+                        @foreach($pengguna as $akun)
+                            <div class="flex flex-wrap items-center justify-between gap-3 py-3">
+                                <div class="min-w-0">
+                                    <p class="truncate text-sm font-semibold">{{ $akun->name }}</p>
+                                    <p class="mt-0.5 truncate text-xs text-muted">{{ $akun->email }} · pencatat {{ $akun->pencatat }}</p>
+                                </div>
+                                <span class="tag {{ $akun->is_admin ? 'tag--netral' : 'tag--masuk' }}">{{ $akun->is_admin ? 'Pengelola' : 'Anggota' }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </article>
+
+                <article class="paper p-5">
+                    <h2 class="font-display text-lg font-semibold">Tambah anggota</h2>
+                    <p class="mt-1 text-sm text-muted">Email menjadi nama masuk. Nama anggota otomatis dipakai sebagai pencatat.</p>
+
+                    <form method="POST" action="{{ route('pengaturan.pengguna.store') }}" class="mt-4 space-y-3">
+                        @csrf
+                        <div>
+                            <label for="pengguna-nama" class="label">Nama</label>
+                            <input id="pengguna-nama" name="name" type="text" value="{{ old('name') }}" maxlength="50" autocomplete="name" required class="input mt-1.5" placeholder="Nama anggota keluarga">
+                            @error('name') <p class="mt-1 text-sm font-semibold text-tomato">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="pengguna-email" class="label">Email</label>
+                            <input id="pengguna-email" name="email" type="email" value="{{ old('email') }}" maxlength="255" autocomplete="email" required class="input mt-1.5" placeholder="nama@keluarga.id">
+                            @error('email') <p class="mt-1 text-sm font-semibold text-tomato">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="pengguna-password" class="label">Kata sandi awal</label>
+                            <input id="pengguna-password" name="password" type="password" minlength="12" autocomplete="new-password" required class="input mt-1.5" placeholder="Minimal 12 karakter">
+                            @error('password') <p class="mt-1 text-sm font-semibold text-tomato">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="pengguna-password-confirmation" class="label">Ulangi kata sandi</label>
+                            <input id="pengguna-password-confirmation" name="password_confirmation" type="password" minlength="12" autocomplete="new-password" required class="input mt-1.5">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full sm:w-auto">Buat akun anggota</button>
+                    </form>
+                </article>
+            </section>
+        @endif
 
         <section class="grid gap-4 lg:grid-cols-[1.1fr_.9fr]">
             <article class="paper p-5">

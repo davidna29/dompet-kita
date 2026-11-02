@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AnggaranController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\BerulangController;
 use App\Http\Controllers\EksporController;
 use App\Http\Controllers\KantongController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\RingkasanController;
 use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/ringkasan', [RingkasanController::class, 'index'])->name('ringkasan');
     Route::get('/kantong', [KantongController::class, 'index'])->name('kantong');
+    Route::get('/kantong/baru', [KantongController::class, 'create'])->name('kantong.create');
+    Route::post('/kantong', [KantongController::class, 'store'])->name('kantong.store');
+    Route::get('/kantong/{kantong}/edit', [KantongController::class, 'edit'])->name('kantong.edit');
+    Route::put('/kantong/{kantong}', [KantongController::class, 'update'])->name('kantong.update');
+    Route::delete('/kantong/{kantong}', [KantongController::class, 'destroy'])->name('kantong.destroy');
+    Route::post('/kantong/arsip/{id}/pulihkan', [KantongController::class, 'pulihkan'])->name('kantong.pulihkan');
     Route::post('/kantong/rekonsiliasi', [KantongController::class, 'rekonsiliasi'])->name('kantong.rekonsiliasi');
     Route::post('/kantong/saldo-awal', [KantongController::class, 'simpanSaldoAwal'])->name('kantong.saldo-awal');
 
@@ -53,4 +60,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/kategori/{kategoriMeta}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+    Route::post('/pengaturan/pengguna', [PenggunaController::class, 'store'])->name('pengaturan.pengguna.store');
 });

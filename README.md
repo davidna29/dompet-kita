@@ -8,14 +8,15 @@ Dokumen produk dan aturan nilai: [`docs/prd-ok.md`](docs/prd-ok.md). Kontrak API
 
 Tahap 1 dan Tahap 2 (FR-001 sampai FR-020):
 
-- login dua akun (David, Nurul) dengan rate limit 5 percobaan/menit/IP;
+- login dengan rate limit 5 percobaan/menit/IP; David dan Nurul menjadi pengelola akun awal, anggota baru dibuat dari Pengaturan;
 - daftar transaksi dengan filter tanggal, jenis, kategori, pencatat, dan kantong;
 - tambah, ubah, dan hapus lunak; riwayat perubahan; nomor client_key untuk idempotensi;
 - ringkasan periode, grafik donat/batang/kumulatif, dan perbandingan bulan lalu;
-- saldo per kantong Tunai/BSI/Shopee, rumus server, rekonsiliasi tanpa penyesuaian otomatis;
+- saldo per kantong, tambah/rename/arsip kantong (arsip hanya saat saldo nol dan tanpa jadwal aktif), rumus server, rekonsiliasi tanpa penyesuaian otomatis;
 - anggaran per kategori dan total, ambang 80%/100%, salinan bulan lalu;
 - jadwal berulang dan konfirmasi tagihan satu ketukan (idempoten per jatuh tempo);
-- ikon, warna, dan urutan kategori;
+- ikon, warna, dan urutan kategori; saran cepat kategori pemasukan Gaji, Honor, Upah, Bonus, Hadiah, dan Proyek;
+- pengelolaan akun keluarga: pengelola menambah anggota; anggota baru tidak mendapat hak kelola akun;
 - ekspor CSV dengan header STB, impor CSV migrasi 19 baris;
 - API Bearer token untuk Hermes, termasuk soft-deleted di `since`;
 - PWA + mode gelap, online-only; service worker hanya menyimpan aset statis.
@@ -62,10 +63,12 @@ Hanya dibuat bila `DEMO_MODE=true` dan `php artisan db:seed` dijalankan. Data ya
 
 Jangan pernah mengaktifkan `DEMO_MODE` atau memakai akun demo di produksi.
 
+Kedua akun demo adalah pengelola. Akun anggota yang dibuat dari **Pengaturan** memakai nama sebagai pencatat, kata sandi minimal 12 karakter, dan tidak dapat membuat akun lain.
+
 ## Perintah penting
 
 ```bash
-php artisan test                         # 42 tes: API, zona WIB, aturan Mutasi, saldo, idempotensi, impor
+php artisan test                         # 56 tes: API, WIB, Mutasi, saldo, idempotensi, impor, kantong, akun
 php artisan migrate --force              # produksi
 php artisan db:seed --class=DemoSeeder   # hanya lokal, data sintetis
 php artisan transaksi:impor-csv path/to/transaksi.csv --dry-run
@@ -127,7 +130,7 @@ Jangan pernah menaruh token di repo, PRD, chat, atau tangkapan layar. Ganti toke
 5. Buat `.env` dari `.env.example`; isi `APP_KEY`, kredensial MySQL, `APP_URL` HTTPS, dan `ADMIN_TOKEN`. Jangan pakai `DEMO_MODE=true`.
 6. Unggah hasil `npm run build` (folder `public/build`) karena server tidak menjalankan Node.
 7. Pastikan `storage/` dan `bootstrap/cache/` dapat ditulis.
-8. Setelah deploy, buat dua akun produksi. Jangan menjalankan seeder demo.
+8. Setelah deploy, provision dua akun produksi awal. Jika akun sudah ada saat migrasi role dijalankan, migrasi menandainya sebagai pengelola; untuk instalasi database kosong, tandai email login awal secara eksplisit, ganti contoh email berikut dengan email produksi: `php artisan tinker --execute="App\\Models\\User::whereIn('email', ['david@example.com', 'nurul@example.com'])->update(['is_admin' => true]);"`. Anggota selanjutnya dibuat dari **Pengaturan**. Jangan menjalankan seeder demo.
 9. Uji `GET /api/health` dari STB, lalu lakukan paralel run dengan CSV beberapa hari sebelum mengganti alur lama.
 10. Sebelum impor CSV, buka **Kantong → Atur saldo awal** dan isi saldo nyata Tunai, BSI, Shopee beserta tanggal hitungnya. Tanpa ini saldo kantong tidak akurat.
 

@@ -65,7 +65,7 @@ Nilai yang diharapkan: satu sumber data yang konsisten, bisa diedit lewat dua ja
 | Nurul Azizah [Konfirmasi] | Sama seperti David | Sama seperti David |
 | Agen Hermes (STB) [Konfirmasi] | Mendorong catatan Telegram, menarik data, mengirim pengingat | Token admin terpisah via API |
 
-**Akun UI [Usulan, belum dikonfirmasi pengguna]:** dua akun terpisah (David, Nurul) agar `pencatat` entri UI terisi otomatis. Alternatif: satu akun keluarga bersama.
+**Akun UI [diperbarui 2026-11-02]:** David dan Nurul adalah pengelola akun awal. Mereka dapat menambahkan anggota keluarga; akun baru berstatus anggota biasa dan `pencatat` transaksi UI diisi otomatis dari akun yang masuk.
 
 ## 5. Cakupan dan tahap rilis
 
@@ -156,6 +156,15 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 
 **FR-020 Saldo per kantong.** Lihat Bagian 7B.
 
+### Addendum kemampuan UI keluarga (disetujui 2026-11-02)
+
+- **Kelola kantong:** pengguna dapat membuat dan mengganti nama kantong. Rename memperbarui referensi `metode` dan `kantong_tujuan` di semua transaksi (termasuk soft-deleted) dan jadwal berulang dalam satu transaksi database; setiap transaksi yang berubah tetap mendapat riwayat dan `updated_at` server. Arsip adalah soft delete, hanya diizinkan bila saldo saat ini nol dan tidak ada jadwal aktif. Kantong arsip dapat dipulihkan; transaksi dan referensi historis tidak dihapus permanen.
+- **Saran pemasukan:** saat `jenis=masuk`, UI menawarkan Gaji, Honor, Upah, Bonus, Hadiah, dan Proyek. `kategori` tetap teks bebas; saran tidak menambah nilai `jenis` atau mengubah kontrak API.
+- **Kantong dari Hermes:** validasi nama kantong aktif berlaku pada pilihan baru di UI. API tetap menerima `metode` bebas sampai Hermes menyinkronkan daftar melalui `GET /api/kantong`; nilai tak dikenal tetap ditandai di UI.
+- **Kelola akun:** kolom internal `users.is_admin` membedakan pengelola UI dari anggota dan tidak muncul pada payload STB. Akun awal David dan Nurul adalah admin; admin dapat membuat akun anggota dengan email unik dan kata sandi awal. Anggota baru tidak dapat membuat akun lain.
+- **Navigasi UI:** preferensi tema terang/gelap harus tetap sama setelah navigasi Livewire; toast sukses/gagal dapat ditutup dan tetap bekerja setelah redirect navigasi.
+- **Semantik sinkron API:** DELETE berulang pada baris yang sudah soft-delete mengembalikan baris terhapus yang sama. PUT tanpa perubahan tidak menggeser `updated_at`. PUT pada baris soft-deleted tetap tidak memulihkannya; belum ada endpoint restore.
+
 ### Could (ditunda)
 - **FR-021 Target tabungan:** nama, nominal, tenggat, progres.
 - **FR-023 Hutang dan piutang:** pihak, nominal, sisa, jatuh tempo; tidak mengubah `jenis`.
@@ -232,7 +241,7 @@ Sumber: Laravel News "Laravel Release Cycle" (https://laravel-news.com/laravel-r
 ## 8. Persyaratan non-fungsional
 
 - **Keamanan [Konfirmasi]:** HTTPS wajib untuk API dan UI; token admin terpisah dari token user; token bocor diganti lewat terminal STB. Token tidak boleh ada di PRD, repo, atau chat.
-- **Privasi:** data keuangan pribadi; akses hanya dua pengguna dan agen STB. Log akses tidak menyimpan isi keterangan transaksi [Usulan].
+- **Privasi:** data keuangan pribadi; akses hanya anggota keluarga terdaftar dan agen STB. Pembuatan akun hanya untuk admin keluarga. Log akses tidak menyimpan isi keterangan transaksi [Usulan].
 - **Kompatibilitas:** berjalan di shared hosting PHP/MySQL tanpa proses persisten [Konfirmasi]; STB tidak wajib menjalankan browser atau websocket [Konfirmasi].
 - **Mobile-first [Konfirmasi]:** keluarga selalu membuka lewat HP; semua layar dirancang untuk ponsel lebih dulu (Bagian 10). Antarmuka Bahasa Indonesia; kontras dan ukuran sentuh memadai.
 - **Kinerja [Usulan, TBD]:** daftar transaksi dimuat dalam waktu wajar di HP dengan koneksi seluler biasa; target angka ditetapkan setelah ada data nyata.
@@ -248,7 +257,7 @@ Tabel `transaksi` (MySQL, utf8mb4) [Konfirmasi; satu kolom tambahan diusulkan]:
 | id | INT AUTO_INCREMENT PK | Stabil, tidak dipakai ulang |
 | tanggal | DATE | YYYY-MM-DD, WIB |
 | jenis | ENUM('masuk','keluar') | Hanya dua nilai, huruf kecil |
-| kategori | VARCHAR(50) | Bebas; 'Mutasi' khusus (pindah kantong, bukan belanja). Normalisasi server: trim spasi, huruf pertama kapital sisanya kecil |
+| kategori | VARCHAR(50) | Bebas; 'Mutasi' khusus (pindah kantong, bukan belanja). Normalisasi server: trim, rapikan spasi berulang, title case per kata |
 | jumlah | INT | Digit polos, bulat positif |
 | keterangan | TEXT | Boleh kosong |
 | pencatat | VARCHAR(50) | 'David NA' / 'Nurul Azizah'; dari UI dipetakan dari akun login, bukan ketikan bebas |
@@ -317,7 +326,7 @@ Tanpa baseline atau target dari pengguna; semuanya **[Usulan, TBD]**:
 | Risiko | PHP di SSH berbeda dari PHP hPanel | Rendah | Atur `PATH` ke biner PHP 8.5 |
 | Risiko | Agen pengembang melanggar aturan nilai (mis. menambah nilai `jenis`) | Sedang | Bagian 19 + uji otomatis |
 | Asumsi | Volume data kecil sehingga tanpa paginasi kompleks | Rendah | Konfirmasi perkiraan volume |
-| Asumsi | Dua akun UI (David, Nurul) | Sedang | Belum dikonfirmasi pengguna |
+| Keputusan | David dan Nurul menjadi admin akun awal; user baru menjadi anggota biasa | Sedang | Disetujui pengguna 2026-11-02 |
 | Asumsi | Kategori tetap teks bebas (sesuai Pola Sinkron), UI menawarkan saran dari kategori yang ada | Rendah | Belum dikonfirmasi pengguna |
 
 **Pertanyaan terbuka**

@@ -17,13 +17,12 @@
     ];
 @endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-palette="olive">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#f2edde" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#141811" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f2edde" data-theme-color>
     <meta name="description" content="Dompet Kita — papan keuangan keluarga: catat, lihat, dan koreksi transaksi dari HP.">
 
     <title>{{ $halaman }} · Dompet Kita</title>
@@ -35,6 +34,9 @@
     <script>
         (function () {
             try {
+                var palet = localStorage.getItem('dompet-palet');
+                document.documentElement.dataset.palette = palet === 'rose' ? 'rose' : 'olive';
+
                 var tema = localStorage.getItem('dompet-tema');
                 if (tema === 'dark' || (tema === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
@@ -75,7 +77,7 @@
             </div>
 
             <div class="px-3 pb-2 pt-6">
-                <a href="{{ route('transaksi.create') }}" class="btn-add flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-bold transition-colors hover:bg-tomato/85">
+                <a href="{{ route('transaksi.create') }}" class="btn-add flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-bold transition-colors hover:bg-action/85">
                     <x-icon name="plus" class="size-4" />
                     Tambah transaksi
                 </a>
@@ -134,7 +136,7 @@
                     <button type="button" x-on:click="buka = !buka" class="grid size-11 place-items-center rounded-xl text-shell-ink hover:bg-shell-soft" aria-label="Buka menu akun">
                         <span class="grid size-8 place-items-center rounded-full bg-shell-soft font-mono text-[10px] font-semibold">{{ inisial($nama) }}</span>
                     </button>
-                    <div x-cloak x-show="buka" x-on:click.outside="buka = false" x-transition.opacity.duration.150ms
+                    <div x-cloak x-show="buka" x-on:click.outside="buka = false" x-transition.opacity.duration.200ms
                          class="absolute right-0 mt-2 w-60 overflow-hidden rounded-xl border border-line bg-paper-raised p-1.5 text-ink shadow-xl">
                         <div class="border-b border-line px-3 py-2.5">
                             <p class="text-sm font-bold">{{ $nama }}</p>
@@ -192,8 +194,8 @@
         <div class="mx-auto grid max-w-lg grid-cols-5 items-end px-2">
             @foreach($navUtama as $index => $item)
                 @if($index === 2)
-                    <a href="{{ route('transaksi.create') }}" class="relative flex min-h-16 flex-col items-center justify-end pb-1.5 text-[10px] font-bold text-tomato" aria-label="Tambah transaksi">
-                        <span class="btn-add absolute -top-5 grid size-14 place-items-center rounded-full shadow-[0_6px_16px_-8px_rgba(120,30,12,.8)] transition-transform active:scale-95">
+                    <a href="{{ route('transaksi.create') }}" class="relative flex min-h-16 flex-col items-center justify-end pb-1.5 text-[10px] font-bold text-action" aria-label="Tambah transaksi">
+                        <span class="btn-add shadow-action absolute -top-5 grid size-14 place-items-center rounded-full transition-transform active:scale-95">
                             <x-icon name="plus" class="size-6" />
                         </span>
                         <span class="mt-9">Tambah</span>

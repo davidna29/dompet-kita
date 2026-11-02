@@ -28,7 +28,7 @@
     "src": "node_modules/@fontsource-variable/karla/files/karla-latin-wght-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-C-AivgoC.css",
+    "file": "assets/app-BJhfAVDt.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -37,7 +37,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BZzEM2l5.js",
+    "file": "assets/app-CBBtrs62.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

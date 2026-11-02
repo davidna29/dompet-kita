@@ -101,6 +101,7 @@ POST /api/transaksi
 - Baru → `201` + `{data, server_time}`.
 - `client_key` sudah ada → `200` + baris lama; tidak ada insert baru.
 - Mutasi wajib `metode` (asal), `kantong_tujuan` (tujuan), keduanya berbeda.
+- `pencatat` wajib untuk menjaga atribusi Telegram. `metode` tetap teks bebas/nullable pada API selama Hermes belum mengambil daftar kantong aktif; nama tak dikenal ditandai di UI.
 - `jumlah` bilangan bulat positif.
 
 ### Ubah
@@ -109,7 +110,7 @@ POST /api/transaksi
 PUT /api/transaksi/{id}
 ```
 
-Kirim field yang berubah. Respons `200` + baris lengkap. `updated_at` ditetapkan server. Baris soft-deleted tidak bisa diubah.
+Kirim field yang berubah. Respons `200` + baris lengkap. `updated_at` ditetapkan server hanya saat ada perubahan nilai. Baris soft-deleted tidak bisa diubah.
 
 ### Hapus (soft)
 
@@ -118,6 +119,7 @@ DELETE /api/transaksi/{id}
 ```
 
 Respons `200` + baris dengan `deleted_at` terisi. Baris tetap muncul di `GET /api/transaksi?since=` agar STB dapat menandai CSV.
+DELETE berulang pada baris yang sama juga mengembalikan `200` + baris terhapus yang sama.
 
 ## Kantong
 
@@ -145,6 +147,8 @@ GET /api/kantong
 ```
 
 Saldo dihitung server. Jangan menghitung ulang dari CSV untuk laporan.
+
+Rename kantong dari UI memperbarui `metode` dan `kantong_tujuan` pada semua transaksi (termasuk soft-deleted) serta jadwal berulang. Perubahan transaksi mencatat riwayat dan memperbarui `updated_at`, sehingga tersedia untuk STB melalui `GET /api/transaksi?since=`. Kantong arsip dikeluarkan dari daftar saldo aktif; referensi historisnya tetap dikenali.
 
 ## Anggaran
 

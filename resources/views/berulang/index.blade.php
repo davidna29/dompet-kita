@@ -82,7 +82,7 @@
                                 <a href="{{ route('berulang.edit', $item) }}" class="btn btn-ghost btn-sm" aria-label="Ubah {{ $item->nama }}"><x-icon name="edit" class="size-4" /></a>
                             </div>
 
-                            <div x-cloak x-show="konfirmasi" class="fixed inset-0 z-[80] flex items-end justify-center bg-black/45 p-3 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="konfirmasi-{{ $item->id }}">
+                            <div x-cloak x-show="konfirmasi" x-transition.opacity.duration.200ms class="fixed inset-0 z-[80] flex items-end justify-center bg-black/45 p-3 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="konfirmasi-{{ $item->id }}">
                                 <div x-on:click.outside="konfirmasi = false" class="w-full max-w-md rounded-2xl border border-line bg-paper-raised p-5 shadow-2xl">
                                     <div class="flex items-start gap-3">
                                         <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-sage-soft text-sage"><x-icon name="circle-check" class="size-5" /></span>

@@ -21,6 +21,20 @@ class SaldoService
             ->map(fn (Kantong $kantong) => $this->hitung($kantong, $sampaiStr));
     }
 
+    public function arsip(?Carbon $sampai = null): Collection
+    {
+        $sampaiStr = ($sampai ?? Carbon::today())->toDateString();
+
+        return Kantong::onlyTrashed()
+            ->orderBy('urutan')
+            ->orderBy('nama')
+            ->get()
+            ->map(fn (Kantong $kantong) => [
+                ...$this->hitung($kantong, $sampaiStr),
+                'diarsipkan_pada' => $kantong->deleted_at?->format('Y-m-d'),
+            ]);
+    }
+
     public function hitung(Kantong $kantong, ?string $sampai = null): array
     {
         $sampai ??= Carbon::today()->toDateString();

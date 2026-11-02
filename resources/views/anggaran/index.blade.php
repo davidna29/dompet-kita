@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="mt-4 progress h-3">
-                <div class="progress__bar {{ $total['status'] === 'lewat' ? 'progress__bar--lewat' : ($total['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="width: {{ min(100, $total['persen']) }}%"></div>
+                <div class="progress__bar {{ $total['status'] === 'lewat' ? 'progress__bar--lewat' : ($total['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="--progress: {{ min(100, $total['persen']) / 100 }}"></div>
             </div>
             <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span class="tag {{ $statusKelas[$total['status']] }}">{{ $labelStatus[$total['status']] }}</span>
@@ -113,7 +113,7 @@
                                         <span class="truncate text-sm font-bold">{{ $row['kategori'] }}</span>
                                         <span class="amount shrink-0 text-xs">{{ rupiah($row['terpakai']) }} <span class="font-sans text-[10px] font-normal text-muted">/ {{ rupiah($row['anggaran']) }}</span></span>
                                     </span>
-                                    <span class="progress mt-2 block h-1.5"><span class="progress__bar {{ $row['status'] === 'lewat' ? 'progress__bar--lewat' : ($row['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="width: {{ min(100, $row['persen']) }}%; display:block"></span></span>
+                                    <span class="progress mt-2 block h-1.5"><span class="progress__bar {{ $row['status'] === 'lewat' ? 'progress__bar--lewat' : ($row['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="--progress: {{ min(100, $row['persen']) / 100 }}; display:block"></span></span>
                                     <span class="mt-1.5 flex items-center justify-between gap-2 text-[10px] text-muted">
                                         <span class="tag {{ $statusKelas[$row['status']] }}">{{ $labelStatus[$row['status']] }} · {{ $row['persen'] }}%</span>
                                         <span>{{ $row['sisa'] >= 0 ? 'Sisa '.rupiah($row['sisa']) : 'Lewat '.rupiah(abs($row['sisa'])) }}</span>

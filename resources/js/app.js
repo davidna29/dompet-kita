@@ -123,6 +123,7 @@ function gambarGrafik() {
         sky: cssVar('--sky'),
         sage: cssVar('--sage'),
     };
+    const durasiGrafik = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 
     Chart.defaults.font.family = cssVar('--font-sans') || 'Karla Variable, sans-serif';
     Chart.defaults.color = warna.muted;
@@ -141,7 +142,7 @@ function gambarGrafik() {
         const umum = {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 520, easing: 'easeOutQuart' },
+            animation: { duration: durasiGrafik, easing: 'easeOutQuart' },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -284,7 +285,15 @@ function gambarGrafik() {
     });
 }
 
-function terapkanTema(tema, simpan = true) {
+function perbaruiWarnaBrowser() {
+    const canvas = cssVar('--canvas');
+
+    document.querySelectorAll('[data-theme-color]').forEach((meta) => {
+        meta.setAttribute('content', canvas);
+    });
+}
+
+function terapkanTema(tema, simpan = true, beritahuGrafik = true) {
     const gelap = tema === 'dark';
     document.documentElement.classList.toggle('dark', gelap);
 
@@ -296,78 +305,172 @@ function terapkanTema(tema, simpan = true) {
         el.textContent = gelap ? 'Mode terang' : 'Mode gelap';
     });
 
-    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { tema: gelap ? 'dark' : 'light' } }));
+    perbaruiWarnaBrowser();
+    if (beritahuGrafik) {
+        window.dispatchEvent(
+            new CustomEvent('theme-changed', {
+                detail: {
+                    tema: gelap ? 'dark' : 'light',
+                    palet: document.documentElement.dataset.palette || 'olive',
+                },
+            })
+        );
+    }
+}
+
+function terapkanPalet(palet, simpan = true, beritahuGrafik = true) {
+    const pilihan = palet === 'rose' ? 'rose' : 'olive';
+    document.documentElement.dataset.palette = pilihan;
+
+    if (simpan) {
+        localStorage.setItem('dompet-palet', pilihan);
+    }
+
+    document.querySelectorAll('[data-palette-select]').forEach((input) => {
+        const aktif = input.value === pilihan;
+        input.checked = aktif;
+
+        const label = input.closest('[data-palette-choice]');
+        label?.classList.toggle('border-olive', aktif);
+        label?.classList.toggle('bg-olive-soft', aktif);
+        label?.classList.toggle('text-olive-deep', aktif);
+    });
+
+    perbaruiWarnaBrowser();
+    if (beritahuGrafik) {
+        window.dispatchEvent(
+            new CustomEvent('theme-changed', {
+                detail: {
+                    tema: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                    palet: pilihan,
+                },
+            })
+        );
+    }
 }
 
 window.toggleTheme = () => {
     terapkanTema(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-theme-toggle]').forEach((tombol) => {
-        tombol.addEventListener('click', () => window.toggleTheme());
-    });
+window.setDompetPalette = (palet) => terapkanPalet(palet);
+
+function terapkanPreferensiTampilan() {
+    const paletTersimpan = localStorage.getItem('dompet-palet');
+    terapkanPalet(paletTersimpan === 'rose' ? 'rose' : 'olive', false, false);
 
     const tersimpan = localStorage.getItem('dompet-tema');
     if (tersimpan === 'dark' || (tersimpan === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        terapkanTema('dark', false);
+        terapkanTema('dark', false, false);
     } else {
-        terapkanTema('light', false);
+        terapkanTema('light', false, false);
     }
+}
+
+function tutupToast(toast) {
+    if (!toast || toast.dataset.menutup === 'true') {
+        return;
+    }
+
+    toast.dataset.menutup = 'true';
+    toast.classList.add('toast--menutup');
+    window.setTimeout(() => toast.remove(), 180);
+}
+
+document.addEventListener('click', (event) => {
+    if (! (event.target instanceof Element)) {
+        return;
+    }
+
+    const tombol = event.target.closest('[data-toast-close]');
+    if (tombol) {
+        tutupToast(tombol.closest('[data-toast]'));
+    }
+});
+
+let promptPasang = null;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    promptPasang = event;
+    document.querySelectorAll('[data-install-app]').forEach((tombol) => {
+        tombol.hidden = false;
+    });
+});
+
+window.addEventListener('theme-changed', () => {
+    window.setTimeout(gambarGrafik, 30);
+});
+
+function perbaruiBannerOffline() {
+    document.querySelectorAll('[data-offline-banner]').forEach((banner) => {
+        banner.hidden = navigator.onLine;
+    });
+}
+
+window.addEventListener('online', perbaruiBannerOffline);
+window.addEventListener('offline', perbaruiBannerOffline);
+
+document.addEventListener('livewire:navigating', (event) => {
+    event.detail?.onSwap?.(() => terapkanPreferensiTampilan());
+});
+
+function inisialisasiHalaman() {
+    document.querySelectorAll('[data-theme-toggle]').forEach((tombol) => {
+        if (tombol.dataset.themeBound !== 'true') {
+            tombol.dataset.themeBound = 'true';
+            tombol.addEventListener('click', () => window.toggleTheme());
+        }
+    });
+
+    document.querySelectorAll('[data-palette-select]').forEach((input) => {
+        if (input.dataset.paletteBound !== 'true') {
+            input.dataset.paletteBound = 'true';
+            input.addEventListener('change', () => {
+                if (input.checked) {
+                    terapkanPalet(input.value);
+                }
+            });
+        }
+    });
+
+    terapkanPreferensiTampilan();
 
     gambarGrafik();
 
-    window.addEventListener('theme-changed', () => {
-        window.setTimeout(gambarGrafik, 30);
-    });
-
     document.querySelectorAll('[data-toast]').forEach((toast) => {
-        const tutup = () => {
-            toast.style.transition = 'opacity .2s ease, transform .2s ease';
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-6px)';
-            window.setTimeout(() => toast.remove(), 220);
-        };
-        toast.querySelector('[data-toast-close]')?.addEventListener('click', tutup);
-        window.setTimeout(tutup, 5200);
+        if (toast.dataset.toastInitialized !== 'true') {
+            toast.dataset.toastInitialized = 'true';
+            window.setTimeout(() => tutupToast(toast), 5200);
+        }
     });
 
-    const bannerOffline = document.querySelector('[data-offline-banner]');
-    if (bannerOffline) {
-        const perbarui = () => {
-            bannerOffline.hidden = navigator.onLine;
-        };
-        window.addEventListener('online', perbarui);
-        window.addEventListener('offline', perbarui);
-        perbarui();
-    }
-
-    let promptPasang = null;
-    window.addEventListener('beforeinstallprompt', (event) => {
-        event.preventDefault();
-        promptPasang = event;
-        document.querySelectorAll('[data-install-app]').forEach((tombol) => {
-            tombol.hidden = false;
-        });
-    });
+    perbaruiBannerOffline();
 
     document.querySelectorAll('[data-install-app]').forEach((tombol) => {
-        tombol.addEventListener('click', async () => {
-            if (!promptPasang) {
-                return;
-            }
-            promptPasang.prompt();
-            await promptPasang.userChoice;
-            promptPasang = null;
-            tombol.hidden = true;
-        });
+        tombol.hidden = promptPasang === null;
+
+        if (tombol.dataset.installBound !== 'true') {
+            tombol.dataset.installBound = 'true';
+            tombol.addEventListener('click', async () => {
+                if (!promptPasang) {
+                    return;
+                }
+                promptPasang.prompt();
+                await promptPasang.userChoice;
+                promptPasang = null;
+                tombol.hidden = true;
+            });
+        }
     });
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
-        });
+    if ('serviceWorker' in navigator && !window.dompetServiceWorkerDiminta) {
+        window.dompetServiceWorkerDiminta = true;
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', inisialisasiHalaman);
+document.addEventListener('livewire:navigated', inisialisasiHalaman);
 
 window.addEventListener('beforeunload', hancurkanGrafik);

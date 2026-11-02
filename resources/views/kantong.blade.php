@@ -20,6 +20,10 @@
                     <x-icon name="settings" class="size-4" />
                     Atur saldo awal
                 </a>
+                <a href="{{ route('kantong.create') }}" class="btn btn-primary btn-sm">
+                    <x-icon name="plus" class="size-4" />
+                    Tambah kantong
+                </a>
                 <a href="{{ route('transaksi.create') }}" class="btn btn-primary btn-sm">
                     <x-icon name="plus" class="size-4" />
                     Tambah transaksi
@@ -53,9 +57,24 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:gap-1">
+                        <div class="flex flex-wrap items-center justify-between gap-2 sm:flex-col sm:items-end sm:gap-1">
                             <p class="amount text-lg">{{ rupiah($k['saldo']) }}</p>
-                            <a href="{{ route('transaksi.index', ['metode' => $k['nama'], 'semua' => 1]) }}" class="link-aksi">Lihat transaksi</a>
+                            <div class="flex flex-wrap items-center justify-end gap-1">
+                                <a href="{{ route('transaksi.index', ['metode' => $k['nama'], 'semua' => 1]) }}" class="link-aksi">Lihat transaksi</a>
+                                <a href="{{ route('kantong.edit', $k['id']) }}" class="link-aksi">Ubah nama</a>
+                                @if($k['alasan_arsip'] === null)
+                                    <x-hapus-form
+                                        :action="route('kantong.destroy', $k['id'])"
+                                        title="Arsipkan kantong {{ $k['nama'] }}?"
+                                        description="Kantong ini hanya bisa diarsipkan saat saldonya nol dan tidak ada jadwal aktif. Riwayat transaksi tetap tersimpan."
+                                        label="Arsipkan"
+                                        confirm="Ya, arsipkan"
+                                        buttonClass="btn btn-ghost btn-sm"
+                                    />
+                                @else
+                                    <span class="max-w-56 px-2 text-[11px] leading-snug text-muted">{{ $k['alasan_arsip'] }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -66,6 +85,29 @@
                 <p class="flex items-start gap-2"><x-icon name="info" class="mt-0.5 size-3.5 shrink-0" /> Transaksi tanpa kantong tidak masuk saldo mana pun.</p>
             </div>
         </section>
+
+        @if($arsip->isNotEmpty())
+            <section class="paper overflow-hidden">
+                <div class="border-b border-line px-4 py-3.5 sm:px-5">
+                    <h2 class="font-display text-base font-semibold">Kantong diarsipkan</h2>
+                    <p class="mt-0.5 text-[11px] text-muted">Riwayatnya tetap tersedia, tetapi tidak bisa dipilih untuk transaksi baru.</p>
+                </div>
+                <div class="divide-y divide-line">
+                    @foreach($arsip as $k)
+                        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
+                            <div>
+                                <p class="text-sm font-semibold">{{ $k['nama'] }}</p>
+                                <p class="mt-0.5 text-[11px] text-muted">Diarsipkan {{ tanggal_id($k['diarsipkan_pada']) }} · saldo arsip {{ rupiah($k['saldo']) }}</p>
+                            </div>
+                            <form method="POST" action="{{ route('kantong.pulihkan', $k['id']) }}">
+                                @csrf
+                                <button type="submit" class="btn btn-ghost btn-sm">Pulihkan</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
 
         <section id="atur-saldo-awal" class="paper overflow-hidden">
             <details class="group">

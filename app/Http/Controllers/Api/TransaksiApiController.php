@@ -66,8 +66,9 @@ class TransaksiApiController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, Transaksi $transaksi, TransaksiService $service): JsonResponse
+    public function destroy(Request $request, int $transaksi, TransaksiService $service): JsonResponse
     {
+        $transaksi = Transaksi::withTrashed()->findOrFail($transaksi);
         $transaksi = $service->hapus($transaksi, null, 'telegram');
 
         return response()->json([

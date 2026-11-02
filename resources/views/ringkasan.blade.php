@@ -204,7 +204,7 @@
                                         <span class="amount shrink-0 text-xs">{{ rupiah($item['total']) }}</span>
                                     </div>
                                     <div class="mt-1.5 flex items-center gap-2">
-                                        <div class="progress flex-1"><div class="progress__bar" style="width: {{ min(100, $persen) }}%; background: {{ $warna }}"></div></div>
+                                        <div class="progress flex-1"><div class="progress__bar" style="--progress: {{ min(100, $persen) / 100 }}; background: {{ $warna }}"></div></div>
                                         <span class="w-8 text-right font-mono text-[10px] text-muted">{{ $persen }}%</span>
                                     </div>
                                 </div>
@@ -240,7 +240,7 @@
                     </div>
                     @if($anggaran['total_anggaran'] > 0)
                         <p class="amount mt-3 text-lg">{{ rupiah($anggaran['total_terpakai']) }} <span class="font-sans text-xs font-normal text-muted">dari {{ rupiah($anggaran['total_anggaran']) }}</span></p>
-                        <div class="progress mt-2"><div class="progress__bar {{ $anggaran['total']['status'] === 'lewat' ? 'progress__bar--lewat' : ($anggaran['total']['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="width: {{ min(100, $anggaran['total']['persen']) }}%"></div></div>
+                        <div class="progress mt-2"><div class="progress__bar {{ $anggaran['total']['status'] === 'lewat' ? 'progress__bar--lewat' : ($anggaran['total']['status'] === 'hampir' ? 'progress__bar--hampir' : '') }}" style="--progress: {{ min(100, $anggaran['total']['persen']) / 100 }}"></div></div>
                         <p class="mt-1.5 text-[11px] text-muted">{{ $anggaran['total']['persen'] }}% terpakai · {{ $anggaran['total']['sisa'] >= 0 ? 'sisa '.rupiah($anggaran['total']['sisa']) : 'lewat '.rupiah(abs($anggaran['total']['sisa'])) }}</p>
                     @else
                         <p class="mt-3 text-sm text-muted">Belum ada anggaran untuk bulan ini.</p>

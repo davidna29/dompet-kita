@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-palette="olive">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f2edde" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#141811" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f2edde" data-theme-color>
     <title>Masuk · Dompet Kita</title>
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="/manifest.webmanifest">
     <script>
         (function () {
             try {
+                var palet = localStorage.getItem('dompet-palet');
+                document.documentElement.dataset.palette = palet === 'rose' ? 'rose' : 'olive';
+
                 var tema = localStorage.getItem('dompet-tema');
                 if (tema === 'dark' || (tema === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');

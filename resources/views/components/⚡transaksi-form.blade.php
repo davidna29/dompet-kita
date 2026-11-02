@@ -80,9 +80,27 @@ new class extends Component
         }
 
         $isMutasi = mb_strtolower($this->kategori) === 'mutasi';
+        $kantongAktif = $this->kantongOptions->pluck('nama')->all();
+        $transaksiLama = $this->transaksi;
+
+        if ($this->metode !== ''
+            && ! in_array($this->metode, $kantongAktif, true)
+            && $this->metode !== $transaksiLama?->metode) {
+            $this->addError('metode', 'Pilih kantong yang masih aktif.');
+
+            return;
+        }
+
         if ($isMutasi) {
             if ($this->metode === '' || $this->kantongTujuan === '') {
                 $this->addError('kantongTujuan', 'Mutasi wajib memilih kantong asal dan tujuan.');
+
+                return;
+            }
+
+            if (! in_array($this->kantongTujuan, $kantongAktif, true)
+                && $this->kantongTujuan !== $transaksiLama?->kantong_tujuan) {
+                $this->addError('kantongTujuan', 'Pilih kantong tujuan yang masih aktif.');
 
                 return;
             }
@@ -138,6 +156,14 @@ new class extends Component
         }
     }
 
+    public function updatedJenis(): void
+    {
+        if ($this->jenis === 'masuk' && mb_strtolower(trim($this->kategori)) === 'mutasi') {
+            $this->kategori = '';
+            $this->kantongTujuan = '';
+        }
+    }
+
     #[Computed]
     public function mutasi(): bool
     {
@@ -154,8 +180,25 @@ new class extends Component
             ->pluck('kategori');
 
         $meta = KategoriMeta::query()->orderBy('urutan')->pluck('kategori');
+        $pemasukan = $this->jenis === 'masuk'
+            ? collect(['Gaji', 'Honor', 'Upah', 'Bonus', 'Hadiah', 'Proyek', 'Usaha', 'Lainnya'])
+            : collect();
 
-        return $dipakai->merge($meta)->unique()->values();
+        $opsi = $pemasukan->merge($dipakai)->merge($meta)->unique()->values();
+
+        return $this->jenis === 'masuk'
+            ? $opsi->reject(fn (string $kategori) => mb_strtolower($kategori) === 'mutasi')->values()
+            : $opsi;
+    }
+
+    #[Computed]
+    public function kategoriCepat(): Collection
+    {
+        if ($this->jenis === 'masuk') {
+            return collect(['Gaji', 'Honor', 'Upah', 'Bonus', 'Hadiah', 'Proyek']);
+        }
+
+        return $this->kategoriOptions->take(6);
     }
 
     #[Computed]
@@ -258,14 +301,16 @@ new class extends Component
                         @endforeach
                     </datalist>
                     <div class="mt-2 flex flex-wrap gap-1.5">
-                        @foreach($this->kategoriOptions->take(6) as $opsi)
+                        @foreach($this->kategoriCepat as $opsi)
                             <button type="button" wire:click="$set('kategori', @js($opsi))" class="chip">
                                 {{ $opsi }}
                             </button>
                         @endforeach
-                        <button type="button" wire:click="$set('kategori', 'Mutasi')" class="chip chip--mutasi">
-                            {!! \App\Support\Icon::svg('repeat', 'size-3.5') !!} Mutasi
-                        </button>
+                        @if($jenis === 'keluar')
+                            <button type="button" wire:click="$set('kategori', 'Mutasi')" class="chip chip--mutasi">
+                                {!! \App\Support\Icon::svg('repeat', 'size-3.5') !!} Mutasi
+                            </button>
+                        @endif
                     </div>
                     @error('kategori') <p class="mt-1 text-sm font-semibold text-tomato">{{ $message }}</p> @enderror
                 </div>
@@ -276,6 +321,9 @@ new class extends Component
                     </label>
                     <select id="metode" wire:model="metode" class="input mt-2">
                         <option value="">Belum dipilih</option>
+                        @if($transaksiId !== null && $metode !== '' && ! $this->kantongOptions->contains('nama', $metode))
+                            <option value="{{ $metode }}">{{ $metode }} · Arsip/tidak terdaftar</option>
+                        @endif
                         @foreach($this->kantongOptions as $kantong)
                             <option value="{{ $kantong->nama }}">{{ $kantong->nama }}</option>
                         @endforeach
@@ -288,6 +336,9 @@ new class extends Component
                         <label for="kantongTujuan" class="label">Kantong tujuan</label>
                         <select id="kantongTujuan" wire:model="kantongTujuan" class="input mt-2">
                             <option value="">Pilih tujuan</option>
+                            @if($transaksiId !== null && $kantongTujuan !== '' && ! $this->kantongOptions->contains('nama', $kantongTujuan))
+                                <option value="{{ $kantongTujuan }}">{{ $kantongTujuan }} · Arsip/tidak terdaftar</option>
+                            @endif
                             @foreach($this->kantongOptions as $kantong)
                                 <option value="{{ $kantong->nama }}">{{ $kantong->nama }}</option>
                             @endforeach
@@ -323,7 +374,7 @@ new class extends Component
             <a href="{{ $transaksiId ? route('transaksi.index') : route('beranda') }}" class="btn btn-ghost">Batal</a>
             <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="simpan">
                 <span wire:loading.remove wire:target="simpan">{!! \App\Support\Icon::svg('pin', 'size-4') !!} {{ $transaksiId ? 'Simpan perubahan' : 'Tempel transaksi' }}</span>
-                <span wire:loading wire:target="simpan">Menyimpan…</span>
+                <span wire:loading wire:target="simpan" class="loading-feedback">Menyimpan…</span>
             </button>
         </div>
     </form>

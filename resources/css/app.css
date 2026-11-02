@@ -23,6 +23,9 @@
     --color-olive: var(--olive);
     --color-olive-deep: var(--olive-deep);
     --color-olive-soft: var(--olive-soft);
+    --color-action: var(--action);
+    --color-action-soft: var(--action-soft);
+    --color-action-ink: var(--action-ink);
     --color-tomato: var(--tomato);
     --color-tomato-soft: var(--tomato-soft);
     --color-ochre: var(--ochre);
@@ -51,6 +54,10 @@
     --olive: #3d4a2e;
     --olive-deep: #2c3621;
     --olive-soft: #e4e7d2;
+    --primary-ink: #fbf8ef;
+    --action: #a83b24;
+    --action-ink: #fbf8ef;
+    --action-soft: #f2ded6;
     --tomato: #a83b24;
     --tomato-soft: #f2ded6;
     --ochre: #87570f;
@@ -68,6 +75,11 @@
     --shell-active: rgba(251, 248, 239, 0.16);
     --shadow-card: 0 1px 0 rgba(64, 54, 35, 0.05), 0 14px 28px -22px rgba(48, 42, 27, 0.5);
     --shadow-pin: 0 1px 2px rgba(42, 35, 20, 0.2), 0 5px 10px -6px rgba(42, 35, 20, 0.28);
+    --shadow-action: 0 6px 16px -8px rgba(120, 30, 12, 0.8);
+    --motion-fast: 180ms;
+    --motion-state: 200ms;
+    --motion-settle: 240ms;
+    --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
     --radius: 14px;
 }
 
@@ -82,6 +94,10 @@ html.dark {
     --olive: #9bb07a;
     --olive-deep: #2a3420;
     --olive-soft: #2c3624;
+    --action: #e07355;
+    --action-ink: #1a2214;
+    --action-soft: #3a241f;
+    --primary-ink: #1a2214;
     --tomato: #e07355;
     --tomato-soft: #3a241f;
     --ochre: #d7a34c;
@@ -94,6 +110,57 @@ html.dark {
     --butter-soft: #362e1c;
     --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.18), 0 16px 34px -24px rgba(0, 0, 0, 0.7);
     --shadow-pin: 0 1px 2px rgba(0, 0, 0, 0.4), 0 5px 10px -6px rgba(0, 0, 0, 0.5);
+    --shadow-action: 0 6px 16px -8px rgba(0, 0, 0, 0.56);
+}
+
+html[data-palette='rose'] {
+    --canvas: #f8eef1;
+    --paper: #fff9fa;
+    --paper-raised: #fffcfd;
+    --ink: #32212a;
+    --muted: #6f5862;
+    --line: #e7d5dc;
+    --line-strong: #cdb4be;
+    --olive: #8f3e5f;
+    --olive-deep: #642b43;
+    --olive-soft: #f1dde5;
+    --primary-ink: #fff9fa;
+    --action: #a23f67;
+    --action-ink: #fff9fa;
+    --action-soft: #f4dfe8;
+    --shell-ink: #fff9fa;
+    --shell-muted: rgba(255, 249, 250, 0.68);
+    --shell-line: rgba(255, 249, 250, 0.18);
+    --shell-soft: rgba(255, 249, 250, 0.1);
+    --shell-active: rgba(255, 249, 250, 0.16);
+    --shadow-card: 0 1px 0 rgba(73, 35, 51, 0.05), 0 14px 28px -22px rgba(73, 35, 51, 0.42);
+    --shadow-pin: 0 1px 2px rgba(73, 35, 51, 0.2), 0 5px 10px -6px rgba(73, 35, 51, 0.3);
+    --shadow-action: 0 6px 16px -8px rgba(104, 37, 64, 0.48);
+}
+
+html.dark[data-palette='rose'] {
+    --canvas: #191217;
+    --paper: #241920;
+    --paper-raised: #2d2028;
+    --ink: #f6eaf0;
+    --muted: #c4acb7;
+    --line: #47313d;
+    --line-strong: #654753;
+    --olive: #e3a3bc;
+    --olive-deep: #472232;
+    --olive-soft: #442737;
+    --action: #f0a0be;
+    --action-ink: #2c1420;
+    --action-soft: #4a2939;
+    --primary-ink: #2c1420;
+    --shell-ink: #fff9fa;
+    --shell-muted: rgba(255, 249, 250, 0.72);
+    --shell-line: rgba(255, 249, 250, 0.18);
+    --shell-soft: rgba(255, 249, 250, 0.1);
+    --shell-active: rgba(255, 249, 250, 0.16);
+    --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.28), 0 16px 34px -24px rgba(0, 0, 0, 0.78);
+    --shadow-pin: 0 1px 2px rgba(0, 0, 0, 0.45), 0 5px 10px -6px rgba(0, 0, 0, 0.58);
+    --shadow-action: 0 6px 16px -8px rgba(0, 0, 0, 0.64);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -137,7 +204,7 @@ html.dark {
     }
 
     :focus-visible {
-        outline: 2px solid var(--tomato);
+        outline: 2px solid var(--action);
         outline-offset: 3px;
         border-radius: 4px;
     }
@@ -152,16 +219,6 @@ html.dark {
         cursor: pointer;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-        }
-    }
 }
 
 @layer components {
@@ -184,16 +241,22 @@ html.dark {
         box-shadow: var(--shadow-card);
     }
 
+    .shadow-action {
+        box-shadow: var(--shadow-action);
+    }
+
     .btn {
         @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-transparent px-4 py-2 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-55;
     }
 
     .btn-primary {
-        @apply bg-olive text-paper hover:bg-olive-deep;
+        @apply bg-olive hover:bg-olive-deep;
+        color: var(--primary-ink);
     }
 
     html.dark .btn-primary {
-        @apply bg-olive text-[#1a2214];
+        @apply bg-olive;
+        color: var(--primary-ink);
     }
 
     html.dark .btn-primary:hover {
@@ -217,11 +280,7 @@ html.dark {
     }
 
     .btn-add {
-        @apply bg-tomato text-shell-ink;
-    }
-
-    html.dark .btn-add {
-        color: #1a2214;
+        @apply bg-action text-action-ink;
     }
 
     .btn-sm {
@@ -326,7 +385,7 @@ html.dark {
 
     .pin {
         @apply grid size-4 place-items-center rounded-full;
-        background: var(--tomato);
+        background: var(--action);
         box-shadow: var(--shadow-pin);
     }
 
@@ -365,8 +424,10 @@ html.dark {
     }
 
     .nav-magnet {
-        @apply ml-auto size-2 rounded-full bg-tomato opacity-0 transition-opacity;
+        @apply ml-auto size-2 rounded-full bg-action opacity-0 transition-opacity;
         box-shadow: var(--shadow-pin);
+        transition-duration: var(--motion-fast);
+        transition-timing-function: var(--motion-ease);
     }
 
     .bottom-link {
@@ -386,7 +447,9 @@ html.dark {
     }
 
     .bottom-dot {
-        @apply absolute -top-1 size-1.5 rounded-full bg-tomato opacity-0 transition-opacity;
+        @apply absolute -top-1 size-1.5 rounded-full bg-action opacity-0 transition-opacity;
+        transition-duration: var(--motion-fast);
+        transition-timing-function: var(--motion-ease);
     }
 
     .progress {
@@ -394,7 +457,11 @@ html.dark {
     }
 
     .progress__bar {
-        @apply h-full rounded-full bg-olive transition-[width] duration-500;
+        @apply h-full rounded-full bg-olive;
+        width: 100%;
+        transform: scaleX(var(--progress, 0));
+        transform-origin: left center;
+        transition: transform var(--motion-settle) var(--motion-ease);
     }
 
     .progress__bar--hampir {
@@ -408,6 +475,18 @@ html.dark {
     .toast {
         @apply flex items-start gap-2.5 rounded-xl border border-line bg-paper-raised px-4 py-3 text-sm shadow-lg;
         box-shadow: var(--shadow-card);
+        animation: toast-arrive var(--motion-state) var(--motion-ease) both;
+    }
+
+    .toast--menutup {
+        opacity: 0;
+        transform: translateY(-5px);
+        transition: opacity var(--motion-fast) ease-out, transform var(--motion-fast) ease-out;
+        pointer-events: none;
+    }
+
+    .loading-feedback {
+        animation: feedback-arrive var(--motion-fast) var(--motion-ease) both;
     }
 
     .table {
@@ -476,11 +555,94 @@ html.dark {
 }
 
 .total-press {
-    animation: total-press 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: total-press 220ms var(--motion-ease) both;
 }
 
 .pin-press {
-    animation: pin-press 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: pin-press 180ms var(--motion-ease) both;
+}
+
+.slip--baru {
+    animation-duration: var(--motion-settle);
+    animation-timing-function: var(--motion-ease);
+}
+
+[class*="transition-"] {
+    transition-duration: var(--motion-state);
+    transition-timing-function: var(--motion-ease);
+}
+
+:is(a, button, summary, input, select, textarea) {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: var(--motion-state);
+    transition-timing-function: var(--motion-ease);
+}
+
+.btn,
+.chip,
+.nav-link,
+.bottom-link,
+.link-aksi {
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-duration: var(--motion-state);
+    transition-timing-function: var(--motion-ease);
+}
+
+.input,
+.jenis-option {
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-duration: var(--motion-state);
+    transition-timing-function: var(--motion-ease);
+}
+
+.slip {
+    transition-property: color, background-color, transform;
+    transition-duration: var(--motion-state);
+    transition-timing-function: var(--motion-ease);
+}
+
+.btn:not(:disabled):active,
+.chip:active,
+.nav-link:active,
+.bottom-link:active,
+.link-aksi:active {
+    transform: scale(0.985);
+}
+
+@keyframes toast-arrive {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes feedback-arrive {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .btn:not(:disabled):active,
+    .chip:active,
+    .nav-link:active,
+    .bottom-link:active,
+    .link-aksi:active,
+    .toast--menutup {
+        transform: none !important;
+    }
 }
 
 .theme-icon-moon {

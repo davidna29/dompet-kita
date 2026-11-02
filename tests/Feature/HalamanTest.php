@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Kantong;
+use App\Models\User;
+use App\Services\TransaksiService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -28,6 +29,7 @@ class HalamanTest extends TestCase
             '/transaksi/baru',
             '/ringkasan',
             '/kantong',
+            '/kantong/baru',
             '/anggaran',
             '/berulang',
             '/berulang/baru',
@@ -43,7 +45,7 @@ class HalamanTest extends TestCase
         $user = User::factory()->create(['pencatat' => 'David NA']);
         $this->actingAs($user);
 
-        app(\App\Services\TransaksiService::class)->buat([
+        app(TransaksiService::class)->buat([
             'tanggal' => today()->toDateString(),
             'jenis' => 'keluar',
             'kategori' => 'Makanan',

@@ -78,7 +78,7 @@
                         </select>
                     </div>
 
-                    <div x-show="mutasi" x-cloak>
+                    <div x-show="mutasi" x-cloak x-transition.opacity.duration.200ms>
                         <label for="kantong_tujuan" class="label">Kantong tujuan</label>
                         <select id="kantong_tujuan" name="kantong_tujuan" class="input mt-1.5">
                             <option value="">Pilih tujuan</option>
