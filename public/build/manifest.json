@@ -1,0 +1,45 @@
+{
+  "node_modules/@fontsource-variable/azeret-mono/files/azeret-mono-latin-ext-wght-normal.woff2": {
+    "file": "assets/azeret-mono-latin-ext-wght-normal-CaAVEd4C.woff2",
+    "src": "node_modules/@fontsource-variable/azeret-mono/files/azeret-mono-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/azeret-mono/files/azeret-mono-latin-wght-normal.woff2": {
+    "file": "assets/azeret-mono-latin-wght-normal-BhHwRSCm.woff2",
+    "src": "node_modules/@fontsource-variable/azeret-mono/files/azeret-mono-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-ext-wght-normal.woff2": {
+    "file": "assets/bricolage-grotesque-latin-ext-wght-normal-CcLUaPy7.woff2",
+    "src": "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2": {
+    "file": "assets/bricolage-grotesque-latin-wght-normal-DLoelf7F.woff2",
+    "src": "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-vietnamese-wght-normal.woff2": {
+    "file": "assets/bricolage-grotesque-vietnamese-wght-normal-BUzh504Q.woff2",
+    "src": "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-vietnamese-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/karla/files/karla-latin-ext-wght-normal.woff2": {
+    "file": "assets/karla-latin-ext-wght-normal-Dq0rrjgs.woff2",
+    "src": "node_modules/@fontsource-variable/karla/files/karla-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/karla/files/karla-latin-wght-normal.woff2": {
+    "file": "assets/karla-latin-wght-normal-C3-ma4ov.woff2",
+    "src": "node_modules/@fontsource-variable/karla/files/karla-latin-wght-normal.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-C-AivgoC.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BZzEM2l5.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

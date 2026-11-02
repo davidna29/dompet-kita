@@ -1,0 +1,26 @@
+{
+    "name": "Dompet Kita — Keuangan Keluarga",
+    "short_name": "Dompet Kita",
+    "description": "Papan keuangan keluarga: catat lewat Telegram, lihat dan koreksi di sini.",
+    "lang": "id",
+    "start_url": "/beranda",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f2edde",
+    "theme_color": "#3d4a2e",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

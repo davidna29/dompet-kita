@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02T16:35:00+07:00",
+  "title": "Design System: Dompet Kita",
+  "extensions": {
+    "colorMeta": {
+      "limewash": {
+        "role": "neutral",
+        "displayName": "Limewash Plaster",
+        "canonical": "#F2EDDE",
+        "tonalRamp": ["#1F1A0F", "#3B3322", "#5C5137", "#8A7C58", "#B8AA83", "#D9CDB0", "#EDE5D3", "#F8F4E9"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Kitchen Paper",
+        "canonical": "#FBF8EF",
+        "tonalRamp": ["#2A2418", "#4A4030", "#6F6451", "#958873", "#BBAE96", "#D8CCB7", "#ECE3D3", "#FBF8EF"]
+      },
+      "raised-paper": {
+        "role": "neutral",
+        "displayName": "Pinned Sheet",
+        "canonical": "#FFFDF6",
+        "tonalRamp": ["#2D271A", "#4D4332", "#716654", "#998B76", "#C0B39B", "#DDD1BD", "#F1E9DA", "#FFFDF6"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Olive Ink",
+        "canonical": "#232A1F",
+        "tonalRamp": ["#050604", "#111510", "#232A1F", "#3A4633", "#58664E", "#7E8C72", "#B0BAA5", "#E8EDE2"]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Quiet Ink",
+        "canonical": "#5F6554",
+        "tonalRamp": ["#121410", "#262A22", "#3F4438", "#5F6554", "#7D846F", "#9BA28D", "#C1C7B5", "#E9ECE2"]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Warm Hairline",
+        "canonical": "#D9D0BB",
+        "tonalRamp": ["#3B362A", "#5A5342", "#7A715C", "#9B917A", "#B9AF98", "#D9D0BB", "#E7E0D0", "#F7F2E6"]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#C4B89C",
+        "tonalRamp": ["#2A261C", "#484333", "#68604A", "#887E66", "#A89D83", "#C4B89C", "#D9CEB6", "#F2EADB"]
+      },
+      "olive": {
+        "role": "primary",
+        "displayName": "Pantry Olive",
+        "canonical": "#3D4A2E",
+        "tonalRamp": ["#0B0F07", "#18200F", "#253118", "#3D4A2E", "#56663F", "#738554", "#9AA870", "#C7D0B4"]
+      },
+      "olive-deep": {
+        "role": "primary",
+        "displayName": "Deep Olive",
+        "canonical": "#2C3621",
+        "tonalRamp": ["#070A04", "#12180B", "#1C2512", "#2C3621", "#43502F", "#5D6C45", "#87976D", "#BEC9A9"]
+      },
+      "olive-soft": {
+        "role": "primary",
+        "displayName": "Olive Tint",
+        "canonical": "#E4E7D2",
+        "tonalRamp": ["#2B2F1C", "#41482D", "#596342", "#74805C", "#909D7A", "#AEB997", "#CED6BB", "#E4E7D2"]
+      },
+      "tomato": {
+        "role": "secondary",
+        "displayName": "Magnet Tomato",
+        "canonical": "#A83B24",
+        "tonalRamp": ["#300B05", "#57150C", "#7A1F10", "#A83B24", "#C95C3F", "#E17A5C", "#EFA48D", "#F8D8CE"]
+      },
+      "tomato-soft": {
+        "role": "secondary",
+        "displayName": "Tomato Wash",
+        "canonical": "#F2DED6",
+        "tonalRamp": ["#3B1B13", "#5A2C20", "#7D4132", "#A35E4B", "#C17D68", "#D79C88", "#EBC0B3", "#F2DED6"]
+      },
+      "ochre": {
+        "role": "secondary",
+        "displayName": "Movement Ochre",
+        "canonical": "#87570F",
+        "tonalRamp": ["#241704", "#3F2A0A", "#5F4010", "#87570F", "#A8731C", "#C4933D", "#DDBB7B", "#F1E3C5"]
+      },
+      "ochre-soft": {
+        "role": "secondary",
+        "displayName": "Ochre Wash",
+        "canonical": "#F1E3C5",
+        "tonalRamp": ["#392B16", "#574526", "#786238", "#9B814C", "#B89F6A", "#D3BF94", "#E8D8B8", "#F1E3C5"]
+      },
+      "sage": {
+        "role": "secondary",
+        "displayName": "Income Sage",
+        "canonical": "#4F6B4A",
+        "tonalRamp": ["#101A0F", "#1D2E1B", "#2E422B", "#4F6B4A", "#6B8764", "#8BA582", "#B6C9AE", "#DFE8D5"]
+      },
+      "sage-soft": {
+        "role": "secondary",
+        "displayName": "Sage Wash",
+        "canonical": "#DFE8D5",
+        "tonalRamp": ["#263222", "#3D4D37", "#5A6D51", "#7A8D70", "#9CAD93", "#BCCBB3", "#D5E0CD", "#DFE8D5"]
+      },
+      "sky": {
+        "role": "secondary",
+        "displayName": "Pocket Sky",
+        "canonical": "#496976",
+        "tonalRamp": ["#0C181D", "#182B33", "#243F4B", "#3B5B69", "#496976", "#658794", "#96B2BC", "#D7E3E7"]
+      },
+      "sky-soft": {
+        "role": "secondary",
+        "displayName": "Sky Wash",
+        "canonical": "#DFE8EA",
+        "tonalRamp": ["#223238", "#354A52", "#4D6570", "#68828D", "#89A2AC", "#AFBEC4", "#CFDADD", "#DFE8EA"]
+      },
+      "butter": {
+        "role": "secondary",
+        "displayName": "Budget Butter",
+        "canonical": "#E8C36A",
+        "tonalRamp": ["#322406", "#5A410C", "#876114", "#B7811B", "#D8A23A", "#E8C36A", "#F0D79A", "#F5EAD0"]
+      },
+      "butter-soft": {
+        "role": "secondary",
+        "displayName": "Butter Tape",
+        "canonical": "#F5EAD0",
+        "tonalRamp": ["#3A2C15", "#5C4824", "#806838", "#A58A53", "#C7AF7B", "#E0CDA6", "#EEDFC4", "#F5EAD0"]
+      },
+      "shell-ink": {
+        "role": "primary",
+        "displayName": "Shell Ink",
+        "canonical": "#FBF8EF",
+        "tonalRamp": ["#3A3830", "#5A574B", "#807C6A", "#A6A28E", "#C8C4B1", "#E0DCCB", "#F1EEE1", "#FBF8EF"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page titles and the login statement only." },
+      "headline": { "displayName": "Headline", "purpose": "Month board, section heads, and sheet titles." },
+      "title": { "displayName": "Title", "purpose": "Card labels and row emphasis." },
+      "body": { "displayName": "Body", "purpose": "Descriptions, notes, and form labels." },
+      "amount": { "displayName": "Amount", "purpose": "All rupiah figures, tabular and tightly tracked." },
+      "label": { "displayName": "Label", "purpose": "Mono caps for metadata, keys, and printed dates." },
+      "micro": { "displayName": "Micro", "purpose": "Tiny status tags and serial metadata." },
+      "caption": { "displayName": "Caption", "purpose": "Helper text and secondary metadata." },
+      "brand": { "displayName": "Brand", "purpose": "The wordmark in the olive shell." }
+    },
+    "shadows": [
+      { "name": "pinned-sheet", "value": "0 1px 0 rgba(64,54,35,.05), 0 14px 28px -22px rgba(48,42,27,.5)", "purpose": "The month board and the login sample, and nothing else." },
+      { "name": "magnet", "value": "0 1px 2px rgba(42,35,20,.2), 0 5px 10px -6px rgba(42,35,20,.28)", "purpose": "The pin dot and the add magnet." },
+      { "name": "modal", "value": "0 25px 50px -12px rgba(0,0,0,.25)", "purpose": "Delete and confirmation dialogs above a dim ground." }
+    ],
+    "motion": [
+      { "name": "slip-in", "value": "420ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "A new or corrected transaction slip lands under its date pin." },
+      { "name": "total-press", "value": "360ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The month total presses down once after a save." },
+      { "name": "pin-press", "value": "260ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The current month magnet settles." },
+      { "name": "reduced-motion", "value": "prefers-reduced-motion: duration 0.01ms", "purpose": "All animation disabled; no information depends on motion." }
+    ],
+    "breakpoints": [
+      { "name": "phone-floor", "value": "360px" },
+      { "name": "phone", "value": "390px" },
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main action on a screen: Save, Apply, Add. Olive on shell ink, 44px high.",
+      "html": "<button class=\"ds-btn-primary\">Simpan perubahan</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:8px 16px; border:1px solid transparent; border-radius:12px; background:var(--olive); color:var(--shell-ink); font-family:'Karla Variable',ui-sans-serif,sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:background-color .16s ease; } .ds-btn-primary:hover { background:var(--olive-deep); } .ds-btn-primary:focus-visible { outline:2px solid var(--tomato); outline-offset:3px; } .ds-btn-primary:disabled { opacity:.55; cursor:not-allowed; }"
+    },
+    {
+      "name": "Add Button",
+      "kind": "button",
+      "refersTo": "button-add",
+      "description": "The tomato magnet used for Tambah. Dark ink in dark mode so the light tomato stays legible.",
+      "html": "<button class=\"ds-btn-add\">+ Tambah transaksi</button>",
+      "css": ".ds-btn-add { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:8px 16px; border:1px solid transparent; border-radius:12px; background:var(--tomato); color:var(--shell-ink); font-family:'Karla Variable',ui-sans-serif,sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:filter .16s ease; } .ds-btn-add:hover { filter:brightness(.94); } .ds-btn-add:focus-visible { outline:2px solid var(--ink); outline-offset:3px; } .dark .ds-btn-add { color:#1a2214; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action and cancel. Hairline border, no fill.",
+      "html": "<button class=\"ds-btn-ghost\">Batal</button>",
+      "css": ".ds-btn-ghost { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:8px 16px; border:1px solid var(--line); border-radius:12px; background:transparent; color:var(--ink); font-family:'Karla Variable',ui-sans-serif,sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:background-color .16s ease; } .ds-btn-ghost:hover { background:var(--olive-soft); } .ds-btn-ghost:focus-visible { outline:2px solid var(--tomato); outline-offset:3px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A paper field with a warm hairline and an olive focus ring.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Kategori</span><input class=\"ds-input\" placeholder=\"Makanan, Tagihan…\"></label>",
+      "css": ".ds-field { display:grid; gap:6px; } .ds-label { color:var(--muted); font-family:'Azeret Mono Variable',ui-monospace,monospace; font-size:10px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; } .ds-input { min-height:44px; width:100%; box-sizing:border-box; padding:10px 14px; border:1px solid var(--line); border-radius:12px; background:var(--paper-raised); color:var(--ink); font-family:'Karla Variable',ui-sans-serif,sans-serif; font-size:14px; } .ds-input::placeholder { color:var(--muted); } .ds-input:focus { outline:none; border-color:var(--olive); box-shadow:0 0 0 3px color-mix(in srgb, var(--olive) 20%, transparent); }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "A 44px paper chip for filters and quick category choices; selected uses olive tint.",
+      "html": "<button class=\"ds-chip ds-chip--active\">Bulan ini</button> <button class=\"ds-chip\">Semua waktu</button>",
+      "css": ".ds-chip { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:4px 10px; border:1px solid var(--line); border-radius:8px; background:var(--paper-raised); color:var(--ink); font-family:'Karla Variable',ui-sans-serif,sans-serif; font-size:12px; font-weight:600; cursor:pointer; } .ds-chip:hover { background:var(--olive-soft); border-color:var(--line-strong); } .ds-chip--active { background:var(--olive-soft); border-color:var(--olive); color:var(--olive-deep); } .ds-chip:focus-visible { outline:2px solid var(--tomato); outline-offset:3px; }"
+    },
+    {
+      "name": "Paper Card",
+      "kind": "card",
+      "refersTo": "paper",
+      "description": "The default data surface: paper, one hairline, 14px corners, no shadow.",
+      "html": "<section class=\"ds-paper\"><h2>Kantong</h2><p>Saldo dihitung server dari transaksi tidak terhapus.</p></section>",
+      "css": ".ds-paper { box-sizing:border-box; padding:20px; border:1px solid var(--line); border-radius:14px; background:var(--paper); color:var(--ink); font-family:'Karla Variable',ui-sans-serif,sans-serif; font-size:14px; line-height:1.6; } .ds-paper h2 { margin:0 0 4px; color:var(--ink); font-family:'Bricolage Grotesque Variable',ui-sans-serif,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em; } .ds-paper p { margin:0; color:var(--muted); }"
+    },
+    {
+      "name": "Pinned Sheet",
+      "kind": "card",
+      "refersTo": "paper-raised",
+      "description": "The month board: raised paper, soft ambient shadow, one magnet and a month tab.",
+      "html": "<article class=\"ds-pinned\"><span class=\"ds-pin\"></span><div class=\"ds-pinned-top\"><div><h2>Papan bulan ini</h2><p>Pengeluaran belanja, tanpa Mutasi.</p></div><span class=\"ds-tab\">NOV 2026</span></div><p class=\"ds-total\">Rp4.650.000</p></article>",
+      "css": ".ds-pinned { position:relative; box-sizing:border-box; padding:24px; border-radius:14px; background:var(--paper-raised); color:var(--ink); box-shadow:0 1px 0 rgba(64,54,35,.05),0 14px 28px -22px rgba(48,42,27,.5); font-family:'Karla Variable',ui-sans-serif,sans-serif; } .ds-pin { position:absolute; top:-6px; right:32px; width:16px; height:16px; border-radius:999px; background:var(--tomato); box-shadow:0 1px 2px rgba(42,35,20,.2),0 5px 10px -6px rgba(42,35,20,.28); } .ds-pinned-top { display:flex; justify-content:space-between; gap:16px; border-bottom:1px solid var(--line); padding-bottom:16px; } .ds-pinned h2 { margin:0; font-family:'Bricolage Grotesque Variable',ui-sans-serif,sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em; } .ds-pinned-top p { margin:4px 0 0; color:var(--muted); font-size:12px; } .ds-tab { align-self:flex-start; padding:4px 10px; border-radius:8px 8px 0 0; background:var(--olive); color:var(--shell-ink); font-family:'Azeret Mono Variable',ui-monospace,monospace; font-size:10px; letter-spacing:.12em; } .ds-total { margin:20px 0 0; font-size:56px; font-weight:700; line-height:1; letter-spacing:-.025em; font-variant-numeric:tabular-nums; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "The olive desktop rail. Shell ink at 70%, active uses shell tint and full shell ink; 44px rows.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-rail-link ds-rail-link--active\" href=\"#\">Beranda</a><a class=\"ds-rail-link\" href=\"#\">Transaksi</a></nav>",
+      "css": ".ds-rail { display:grid; gap:4px; width:256px; padding:12px; border-radius:14px; background:var(--olive-deep); font-family:'Karla Variable',ui-sans-serif,sans-serif; } .ds-rail-link { display:flex; align-items:center; min-height:44px; padding:0 12px; border-radius:12px; color:color-mix(in srgb, var(--shell-ink) 70%, transparent); font-size:14px; font-weight:600; text-decoration:none; } .ds-rail-link:hover { background:color-mix(in srgb, var(--shell-ink) 10%, transparent); color:var(--shell-ink); } .ds-rail-link--active { background:color-mix(in srgb, var(--shell-ink) 16%, transparent); color:var(--shell-ink); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Papan yang Diteken",
+    "overview": "Dompet Kita is a family ledger that behaves like a kitchen noticeboard: calm enough to live on a phone at the end of the day, precise enough that the bank statement arithmetic is never in doubt. The world is warm limewash plaster, cream paper slips, deep olive shell, and a small set of magnet colours doing real work. It is a working product first; the board is the material, not the metaphor overlaying the work.\n\nThe interface is built around one sheet — the month card — and the slips that hang under it. Pins and magnets mark only current, active, or newly pinned states, never decoration. The arithmetic lives in the type: amounts are set in a tabular, tightly tracked body face, while tiny monospaced caps act like printed labels on a household file. Mutasi is ochre and reads as movement; spending is tomato and reads as an alert; income is sage; pockets are sky.\n\nThe system is deliberately flat: warm hairlines and tonal paper do most of the hierarchy work, with one raised sheet reserved for the month board and the login sample. It is mobile-first at 360–390 px, expands to a sidebar at desktop, and never trades a familiar control for a costume.",
+    "keyCharacteristics": [
+      "Warm limewash ground, cream paper surfaces, deep olive shell.",
+      "Tomato for spending and action, ochre for Mutasi, sage for income, sky for pockets.",
+      "Pins and magnets are functional markers, not ornament.",
+      "Tabular Karla amounts; Bricolage Grotesque headings; Azeret Mono labels.",
+      "44 px minimum targets, no horizontal scroll, visible loading, empty, error, success, and delete states.",
+      "Standard web controls in a committed visual world."
+    ],
+    "rules": [
+      { "name": "The Mutasi Colour Rule", "body": "Ochre is reserved for movement between pockets, budget warnings, and Mutasi labels. Spending is tomato; income is sage. Never let Mutasi wear the spending colour alone.", "section": "colors" },
+      { "name": "The One Pin Rule", "body": "A pin or magnet marks one current, active, or newly pinned thing. The current month gets the pin; the active nav item gets the magnet. A second pin is a bug.", "section": "colors" },
+      { "name": "The Honest Total Rule", "body": "Every total states its scope. Belanja excludes Mutasi; saldo kantong includes it. Colour alone is not allowed to carry that distinction.", "section": "colors" },
+      { "name": "The Figures Are Content Rule", "body": "Amounts use tabular Karla, not mono. Mono is for labels, keys, and printed dates; it is a measuring voice, not a costume.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "A sheet is flat unless it is the month board or a modal. If everything is elevated, nothing is.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the month card, slips, and pockets as the primary composition; the board is the product.",
+      "Do use tomato for spending/action, ochre for Mutasi/warning, sage for income, sky for pockets.",
+      "Do state scope next to every total; Mutasi tidak dihitung belongs on the month card and summary.",
+      "Do keep 44 px targets, 16 px page inset, and the 360 px floor.",
+      "Do use one pin or magnet for the current/active thing.",
+      "Do use tabular Karla for amounts and Azeret Mono only for labels, keys, and printed dates.",
+      "Do label synthetic data with the persistent Data contoh strip.",
+      "Do show the actual changed fields in history.",
+      "Do use the designed delete/confirm modal, not the browser confirm."
+    ],
+    "donts": [
+      "Don't turn the board into scrapbook: no handwriting, cork, torn paper, fake tape, sticker packs, or decorative pins.",
+      "Don't use a grey screen with one green accent; the magnet colours are part of the system.",
+      "Don't put a pin on every card or a shadow under every surface.",
+      "Don't use mono for prose or as a technical costume.",
+      "Don't put cards inside cards or use colored border-left blocks.",
+      "Don't use gradient text, glass, glowing edges, or hard offset shadows.",
+      "Don't use page-number pagination; keep previous/next with a plain Indonesian count.",
+      "Don't present synthetic rupiah as real family history.",
+      "Don't add offline data storage; the PWA caches static assets only.",
+      "Don't let a heading depend on an eyebrow label; the heading carries its own weight."
+    ]
+  }
+}

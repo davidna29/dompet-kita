@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Offline · Dompet Kita</title>
+    <style>
+        :root {
+            --canvas: #f2edde;
+            --paper: #fbf8ef;
+            --ink: #232a1f;
+            --muted: #5f6554;
+            --line: #d9d0bb;
+            --olive: #3d4a2e;
+            --tomato: #a83b24;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: var(--canvas);
+            color: var(--ink);
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+        main {
+            width: min(100%, 420px);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--paper);
+            padding: 28px;
+        }
+        .mark {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 48px;
+            height: 48px;
+            padding: 10px;
+            border-radius: 14px;
+            background: var(--olive);
+        }
+        .mark span { height: 4px; border-radius: 99px; background: var(--paper); align-self: center; }
+        .mark span:nth-child(4), .mark span:nth-child(5), .mark span:nth-child(6) { display: none; }
+        h1 { margin: 20px 0 8px; font-size: 28px; letter-spacing: -0.03em; }
+        p { margin: 0; font-size: 14px; line-height: 1.65; color: var(--muted); }
+        a {
+            display: inline-flex;
+            min-height: 44px;
+            align-items: center;
+            margin-top: 24px;
+            padding: 0 16px;
+            border-radius: 12px;
+            background: var(--olive);
+            color: var(--paper);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .note { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 11px; }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --canvas: #141811;
+                --paper: #1d231a;
+                --ink: #f1eedf;
+                --muted: #a9ae9b;
+                --line: #353d2d;
+                --olive: #9bb07a;
+                --paper-on-olive: #1a2214;
+            }
+            a { color: var(--paper-on-olive); }
+            .mark { background: var(--olive); }
+            .mark span { background: var(--paper-on-olive); }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <h1>Kamu sedang offline.</h1>
+        <p>Papan keuangan tidak menyimpan data di perangkat ini. Sambungkan kembali internet untuk melihat saldo dan mencatat transaksi.</p>
+        <a href="/beranda">Coba lagi</a>
+        <p class="note">Dompet Kita · online-only. PWA hanya menyimpan aset tampilan, bukan data keluarga.</p>
+    </main>
+</body>
+</html>
