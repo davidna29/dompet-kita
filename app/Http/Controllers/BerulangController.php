@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TransaksiBerulang;
 use App\Models\Kantong;
 use App\Models\Transaksi;
+use App\Models\TransaksiBerulang;
 use App\Models\User;
 use App\Services\PengingatService;
 use App\Support\JumlahParser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -35,9 +36,7 @@ class BerulangController extends Controller
 
     public function store(Request $request, PengingatService $service): RedirectResponse
     {
-        $data = $this->validated($request);
-
-        TransaksiBerulang::create($data);
+        $service->simpan($this->validated($request));
 
         return redirect()
             ->route('berulang.index')
@@ -54,9 +53,9 @@ class BerulangController extends Controller
         ]);
     }
 
-    public function update(Request $request, TransaksiBerulang $berulang): RedirectResponse
+    public function update(Request $request, TransaksiBerulang $berulang, PengingatService $service): RedirectResponse
     {
-        $berulang->update($this->validated($request));
+        $service->perbarui($berulang, $this->validated($request));
 
         return redirect()
             ->route('berulang.index')
@@ -135,7 +134,7 @@ class BerulangController extends Controller
         ];
     }
 
-    private function kategori(): \Illuminate\Support\Collection
+    private function kategori(): Collection
     {
         return Transaksi::query()
             ->where('kategori', '!=', 'Mutasi')

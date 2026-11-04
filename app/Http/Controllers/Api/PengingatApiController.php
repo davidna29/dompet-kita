@@ -4,33 +4,59 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\KonfirmasiPengingatRequest;
+use App\Http\Requests\Api\SimpanPengingatRequest;
+use App\Http\Requests\Api\UpdatePengingatRequest;
+use App\Http\Resources\PengingatResource;
 use App\Http\Resources\TransaksiResource;
 use App\Models\TransaksiBerulang;
 use App\Services\PengingatService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PengingatApiController extends Controller
 {
-    public function index(PengingatService $service): JsonResponse
+    public function index(Request $request, PengingatService $service): JsonResponse
     {
-        $data = $service->daftar()->map(fn (TransaksiBerulang $jadwal) => [
-            'id' => $jadwal->id,
-            'nama' => $jadwal->nama,
-            'kategori' => $jadwal->kategori,
-            'jumlah' => (int) $jadwal->jumlah,
-            'aturan' => $jadwal->aturan,
-            'jatuh_tempo' => $jadwal->jatuh_tempo->format('Y-m-d'),
-            'metode' => $jadwal->metode,
-            'kantong_tujuan' => $jadwal->kantong_tujuan,
-            'pencatat' => $jadwal->pencatat,
-            'aktif' => (bool) $jadwal->aktif,
-            'status' => $jadwal->status,
-            'client_key_konfirmasi' => $jadwal->client_key_konfirmasi,
-            'terakhir_dikonfirmasi' => $jadwal->terakhir_dikonfirmasi?->format('Y-m-d'),
-        ]);
+        $data = $service->daftar($request->boolean('semua'));
 
         return response()->json([
-            'data' => $data,
+            'data' => PengingatResource::collection($data)->resolve($request),
+            'server_time' => waktu_api(),
+        ]);
+    }
+
+    public function store(SimpanPengingatRequest $request, PengingatService $service): JsonResponse
+    {
+        $jadwal = $service->simpan($request->validated());
+
+        return response()->json([
+            'data' => (new PengingatResource($jadwal))->resolve($request),
+            'dibuat' => $jadwal->wasRecentlyCreated,
+            'server_time' => waktu_api(),
+        ], $jadwal->wasRecentlyCreated ? 201 : 200);
+    }
+
+    public function update(
+        UpdatePengingatRequest $request,
+        TransaksiBerulang $pengingat,
+        PengingatService $service
+    ): JsonResponse {
+        $jadwal = $service->perbarui($pengingat, $request->validated());
+
+        return response()->json([
+            'data' => (new PengingatResource($jadwal))->resolve($request),
+            'server_time' => waktu_api(),
+        ]);
+    }
+
+    public function destroy(Request $request, string $pengingat, PengingatService $service): JsonResponse
+    {
+        $jadwal = TransaksiBerulang::withTrashed()->findOrFail((int) $pengingat);
+        $jadwal = $service->hapus($jadwal);
+
+        return response()->json([
+            'data' => (new PengingatResource($jadwal))->resolve($request),
+            'dihapus' => true,
             'server_time' => waktu_api(),
         ]);
     }

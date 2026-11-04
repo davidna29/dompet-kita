@@ -13,12 +13,12 @@ Tahap 1 dan Tahap 2 (FR-001 sampai FR-020):
 - tambah, ubah, dan hapus lunak; riwayat perubahan; nomor client_key untuk idempotensi;
 - ringkasan periode, grafik donat/batang/kumulatif, dan perbandingan bulan lalu;
 - saldo per kantong, tambah/rename/arsip kantong (arsip hanya saat saldo nol dan tanpa jadwal aktif), rumus server, rekonsiliasi tanpa penyesuaian otomatis;
-- anggaran per kategori dan total, ambang 80%/100%, salinan bulan lalu;
-- jadwal berulang dan konfirmasi tagihan satu ketukan (idempoten per jatuh tempo);
-- ikon, warna, dan urutan kategori; saran cepat kategori pemasukan Gaji, Honor, Upah, Bonus, Hadiah, dan Proyek;
+- anggaran per kategori dan total, ambang 80%/100%, salinan bulan lalu; API baca/tulis anggaran untuk Hermes;
+- jadwal berulang dan konfirmasi tagihan satu ketukan; API baca/tulis jadwal dengan `client_key` idempoten;
+- ikon, warna, dan urutan kategori; saran cepat kategori pemasukan Gaji, Honor, Upah, Bonus, Hadiah, dan Proyek; `GET /api/kategori` read-only untuk Hermes;
 - pengelolaan akun keluarga: pengelola menambah anggota; anggota baru tidak mendapat hak kelola akun;
 - ekspor CSV dengan header STB, impor CSV migrasi 19 baris;
-- API Bearer token untuk Hermes, termasuk soft-deleted di `since`;
+- API Bearer token untuk Hermes, termasuk soft-deleted di `since` dan `GET/POST/DELETE /api/anggaran` serta salin periode;
 - PWA + mode gelap, online-only; service worker hanya menyimpan aset statis.
 
 Could (target tabungan, hutang/piutang, kalender, pencarian, tag, PDF/Excel, foto struk) belum dibangun sesuai PRD.
@@ -68,7 +68,7 @@ Kedua akun demo adalah pengelola. Akun anggota yang dibuat dari **Pengaturan** m
 ## Perintah penting
 
 ```bash
-php artisan test                         # 56 tes: API, WIB, Mutasi, saldo, idempotensi, impor, kantong, akun
+php artisan test                         # 81 tes: API, WIB, Mutasi, saldo, idempotensi, impor, kantong, akun, anggaran, kategori, berulang
 php artisan migrate --force              # produksi
 php artisan db:seed --class=DemoSeeder   # hanya lokal, data sintetis
 php artisan transaksi:impor-csv path/to/transaksi.csv --dry-run
@@ -110,6 +110,14 @@ curl -X POST "https://domain-anda/api/transaksi" \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"tanggal":"2026-11-02","jenis":"keluar","kategori":"Makanan","jumlah":35000,"keterangan":"Belanja pasar","pencatat":"David NA","metode":"Tunai","sumber":"telegram","client_key":"TELEGRAM-123-456"}'
+
+curl -H "Authorization: Bearer $ADMIN_TOKEN" \
+  "https://domain-anda/api/anggaran?periode=2026-11"
+
+curl -X POST "https://domain-anda/api/anggaran" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"periode":"2026-11","kategori":"Makanan","jumlah":2200000,"ambang":75}'
 ```
 
 Jangan pernah menaruh token di repo, PRD, chat, atau tangkapan layar. Ganti token lewat terminal STB bila bocor.
@@ -162,7 +170,7 @@ Arah visual: **Papan Dapur** — krem kapur, zaitun, tomat, oker, tipografi Bric
 
 ## Verifikasi rilis
 
-- `php artisan test` — 42 tes, 142 assertion (API, WIB/`since`, idempotensi, Mutasi, saldo, anggaran, impor, login throttle).
+- `php artisan test` — 81 tes, 417 assertion (API, WIB/`since`, idempotensi, Mutasi, saldo, anggaran baca/tulis, kategori, jadwal berulang, impor, login throttle).
 - `impeccable detect` pada `resources/views`, `resources/css`, `resources/js` — 0 temuan.
 - Tangkapan 390 dan 1440, termasuk mode gelap, ada di `.impeccable/review/`.
 - PWA PNG di `public/icons/` membawa provenance yang disematkan. `public/favicon.ico` dihasilkan dari `favicon-32.png` oleh `scripts/make-favicon.php`.

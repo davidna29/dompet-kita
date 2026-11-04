@@ -142,11 +142,11 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 
 **FR-013 Dashboard beranda.** Untuk bulan berjalan: total pemasukan, total pengeluaran (tanpa Mutasi), selisih, perbandingan dengan bulan lalu, 5 kategori terbesar, pengeluaran per pencatat. Grafik: donat pengeluaran per kategori, batang tren 6 bulan, garis kumulatif harian. Angka sama dengan FR-006 dan laporan Hermes; Mutasi tidak masuk grafik kategori.
 
-**FR-014 Anggaran per kategori.** Anggaran bulanan per kategori dan/atau total; progres (terpakai, sisa, persen). Given anggaran Makanan Rp1.000.000 dan pengeluaran Makanan bulan ini Rp800.000, Then progres 80% dan ditandai "hampir habis". Ambang peringatan default 80% dan 100% [Usulan]. Mutasi dan pemasukan tidak dihitung. Bulan baru memakai anggaran bulan sebelumnya kecuali diubah.
+**FR-014 Anggaran per kategori.** Anggaran bulanan per kategori dan/atau total; progres (terpakai, sisa, persen). Given anggaran Makanan Rp1.000.000 dan pengeluaran Makanan bulan ini Rp800.000, Then progres 80% dan ditandai "hampir habis". Ambang peringatan default 80% dan 100% [Usulan]. Mutasi dan pemasukan tidak dihitung. Bulan baru memakai anggaran bulan sebelumnya kecuali diubah. UI dan Hermes memakai sumber angka yang sama melalui `GET /api/anggaran`; perubahan anggaran dari Hermes memakai `POST /api/anggaran`, `DELETE /api/anggaran/{id}`, dan `POST /api/anggaran/salin` dengan validasi yang sama seperti UI.
 
-**FR-015 Transaksi berulang dan pengingat tagihan.** Jadwal berisi nama, kategori, jumlah, aturan ulang, metode, pencatat default. Transaksi **tidak dibuat otomatis tanpa konfirmasi**: pada hari jatuh tempo Hermes mengirim pengingat; pengguna konfirmasi satu ketukan di UI atau balasan singkat di chat, dan baru saat itu transaksi dibuat dengan `sumber` sesuai tempat konfirmasi (`ui` atau `telegram`). Konfirmasi dua kali untuk jatuh tempo yang sama tidak membuat baris ganda (`client_key` = `ULANG-<id jadwal>-<YYYYMMDD>` [Usulan]). Jumlah boleh diubah saat konfirmasi. Penjadwalan memakai cron Hermes di STB. Jadwal dihapus secara soft.
+**FR-015 Transaksi berulang dan pengingat tagihan.** Jadwal berisi nama, kategori, jumlah, aturan ulang, metode, pencatat default. Transaksi **tidak dibuat otomatis tanpa konfirmasi**: pada hari jatuh tempo Hermes mengirim pengingat; pengguna konfirmasi satu ketukan di UI atau balasan singkat di chat, dan baru saat itu transaksi dibuat dengan `sumber` sesuai tempat konfirmasi (`ui` atau `telegram`). Konfirmasi dua kali untuk jatuh tempo yang sama tidak membuat baris ganda (`client_key` = `ULANG-<id jadwal>-<YYYYMMDD>` [Usulan]). Jumlah boleh diubah saat konfirmasi. Penjadwalan memakai cron Hermes di STB. Jadwal dihapus secara soft. CRUD jadwal tersedia lewat API dengan `client_key` unik nullable untuk idempotensi POST; PUT parsial tidak mengubah `client_key`, dan DELETE adalah soft delete idempoten.
 
-**FR-016 Ikon, warna, urutan kategori.** Tabel `kategori_meta`; `transaksi.kategori` tetap teks bebas. Kategori tanpa meta tampil dengan ikon dan warna default; kategori baru dari chat tetap diterima. Mutasi punya penanda visual khusus.
+**FR-016 Ikon, warna, urutan kategori.** Tabel `kategori_meta`; `transaksi.kategori` tetap teks bebas. Kategori tanpa meta tampil dengan ikon dan warna default; kategori baru dari chat tetap diterima. Mutasi punya penanda visual khusus. `GET /api/kategori` menyajikan daftar read-only untuk Hermes; perubahan ikon/warna/urutan tetap hanya dari UI.
 
 **FR-017 Riwayat perubahan.** Setiap edit/hapus menyimpan waktu, siapa (David NA, Nurul Azizah, atau Hermes), sumber, nilai sebelum dan sesudah. UI menampilkan "terakhir diubah oleh X pada Y" dan daftar riwayat.
 
@@ -164,6 +164,9 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 - **Kelola akun:** kolom internal `users.is_admin` membedakan pengelola UI dari anggota dan tidak muncul pada payload STB. Akun awal David dan Nurul adalah admin; admin dapat membuat akun anggota dengan email unik dan kata sandi awal. Anggota baru tidak dapat membuat akun lain.
 - **Navigasi UI:** preferensi tema terang/gelap harus tetap sama setelah navigasi Livewire; toast sukses/gagal dapat ditutup dan tetap bekerja setelah redirect navigasi.
 - **Semantik sinkron API:** DELETE berulang pada baris yang sudah soft-delete mengembalikan baris terhapus yang sama. PUT tanpa perubahan tidak menggeser `updated_at`. PUT pada baris soft-deleted tetap tidak memulihkannya; belum ada endpoint restore.
+- **API anggaran baca/tulis:** `GET /api/anggaran` menyajikan snapshot periode; `POST /api/anggaran` melakukan upsert idempoten per `periode` + `kategori` (`null` = total bulanan); `DELETE /api/anggaran/{id}` adalah soft delete idempoten; `POST /api/anggaran/salin` menyalin periode sebelumnya. Kategori dinormalisasi title case dan `Mutasi` ditolak. Hermes hanya menghapus anggaran setelah instruksi eksplisit pengguna, dan pemakaian anggaran tetap mengecualikan Mutasi serta pemasukan.
+- **API kategori read-only:** `GET /api/kategori` menggabungkan kategori transaksi dan `kategori_meta` aktif, termasuk fallback ikon/warna/urutan, jumlah pemakaian masuk/keluar, dan penanda Mutasi. Tidak ada endpoint tulis; meta kategori tetap dikelola dari UI.
+- **API transaksi berulang baca/tulis:** `GET /api/pengingat` default hanya jadwal aktif (`semua=1` menampilkan nonaktif), `POST /api/pengingat`, `PUT /api/pengingat/{id}`, `DELETE /api/pengingat/{id}` soft delete idempoten, dan konfirmasi yang sudah ada. `client_key` unik nullable pada `transaksi_berulang` membuat POST idempoten; `client_key` tidak dapat diubah lewat PUT. Hermes tidak menghidupkan jadwal soft-deleted secara otomatis.
 
 ### Could (ditunda)
 - **FR-021 Target tabungan:** nama, nominal, tenggat, progres.
@@ -180,14 +183,14 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 | FR-012 | Pull sesuai permintaan | 2 | Tidak ada | Hermes menarik data sebelum menjawab |
 | FR-013 | Dashboard | 2 | Tidak ada | Tidak ada |
 | FR-014 | Anggaran | 2 | `anggaran` | Hermes membaca anggaran untuk peringatan |
-| FR-015 | Transaksi berulang + pengingat | 2 | `transaksi_berulang` | Hermes menjalankan pengingat terjadwal |
-| FR-016 | Ikon/warna kategori | 2 | `kategori_meta` | Tidak ada |
+| FR-015 | Transaksi berulang + pengingat | 2 | `transaksi_berulang` + `client_key` | Hermes menjalankan pengingat dan dapat membuat/mengubah jadwal lewat API |
+| FR-016 | Ikon/warna kategori | 2 | `kategori_meta`, `GET /api/kategori` | Hermes membaca kategori dan meta; penulisan meta tetap di UI |
 | FR-017 | Riwayat perubahan | 2 (dicatat sejak 1) | `transaksi_riwayat` | Tidak ada |
 | FR-018 | Peringatan + ringkasan pintar | 2 | Memakai FR-014, FR-015 | Pesan Telegram tambahan |
 | FR-019 | PWA + mode gelap | 2 | Tidak ada | Tidak ada |
 | FR-020 | Saldo per kantong | 2 (kolom sejak 1) | `kantong`, kolom `kantong_tujuan` | Perlu persetujuan skema |
 
-Tabel `transaksi` dan aturan nilai di Bagian 9 tidak berubah, kecuali satu kolom opsional `kantong_tujuan` (Bagian 7B). Tabel tambahan memakai konvensi yang sama (jumlah INT digit polos, WIB, soft delete).
+Tabel `transaksi` dan aturan nilai di Bagian 9 tidak berubah, kecuali satu kolom opsional `kantong_tujuan` (Bagian 7B). Tabel tambahan memakai konvensi yang sama (jumlah INT digit polos, WIB, soft delete). `transaksi_berulang` mendapat kolom opsional `client_key` VARCHAR(64) UNIQUE NULL untuk idempotensi pembuatan jadwal dari Hermes.
 
 ## 7B. Saldo per kantong (FR-020)
 

@@ -24,6 +24,7 @@ class TransaksiBerulang extends Model
         'pencatat',
         'aktif',
         'terakhir_dikonfirmasi',
+        'client_key',
     ];
 
     protected function casts(): array
@@ -45,7 +46,7 @@ class TransaksiBerulang extends Model
     {
         $this->attributes['jatuh_tempo'] = $nilai instanceof \DateTimeInterface
             ? $nilai->format('Y-m-d')
-            : \Carbon\Carbon::parse((string) $nilai)->toDateString();
+            : Carbon::parse((string) $nilai)->toDateString();
     }
 
     public function setTerakhirDikonfirmasiAttribute(mixed $nilai): void
@@ -54,7 +55,7 @@ class TransaksiBerulang extends Model
             ? null
             : ($nilai instanceof \DateTimeInterface
                 ? $nilai->format('Y-m-d')
-                : \Carbon\Carbon::parse((string) $nilai)->toDateString());
+                : Carbon::parse((string) $nilai)->toDateString());
     }
 
     public function getStatusAttribute(): string

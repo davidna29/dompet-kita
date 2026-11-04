@@ -152,11 +152,13 @@ Rename kantong dari UI memperbarui `metode` dan `kantong_tujuan` pada semua tran
 
 ## Anggaran
 
+### Daftar / snapshot periode
+
 ```http
 GET /api/anggaran?periode=2026-11
 ```
 
-`periode` opsional, format `YYYY-MM`, default bulan berjalan.
+`periode` opsional, format `YYYY-MM`, default bulan berjalan. Bila periode yang diminta belum punya anggaran, server meminjam anggaran terdekat sebelumnya dan mengisi `dipinjam: true` serta `periode_sebelumnya`.
 
 ```json
 {
@@ -166,16 +168,99 @@ GET /api/anggaran?periode=2026-11
     "periode_sebelumnya": null,
     "total_anggaran": 7500000,
     "total_terpakai": 4650000,
-    "total": { "kategori": "Total bulanan", "anggaran": 7500000, "terpakai": 4650000, "sisa": 2850000, "persen": 62, "ambang": 80, "status": "aman" },
+    "total": { "id": 10, "kategori": "Total bulanan", "anggaran": 7500000, "terpakai": 4650000, "sisa": 2850000, "persen": 62, "ambang": 80, "status": "aman" },
     "rows": [
-      { "kategori": "Makanan", "anggaran": 2200000, "terpakai": 1873000, "sisa": 327000, "persen": 85, "ambang": 75, "status": "hampir" }
+      { "id": 11, "kategori": "Makanan", "anggaran": 2200000, "terpakai": 1873000, "sisa": 327000, "persen": 85, "ambang": 75, "status": "hampir" }
     ]
   },
   "server_time": "2026-11-02T09:15:00"
 }
 ```
 
-`status`: `aman`, `hampir`, atau `lewat`. Mutasi dan pemasukan tidak dihitung.
+`status`: `aman`, `hampir`, atau `lewat`. Mutasi dan pemasukan tidak dihitung. Baris hasil pinjaman bulan sebelumnya memiliki `id: null`; baris itu tidak dapat dihapus dari periode pinjaman.
+
+### Simpan / perbarui (upsert idempoten)
+
+```http
+POST /api/anggaran
+```
+
+```json
+{
+  "periode": "2026-11",
+  "kategori": "Makanan",
+  "jumlah": 2200000,
+  "ambang": 75
+}
+```
+
+- `kategori: null` atau `"__total__"` menyimpan batas total bulanan. Field `kategori` wajib hadir, boleh `null`.
+- Kategori dinormalisasi trim, spasi dirapatkan, dan title case; `Mutasi` ditolak karena bukan belanja.
+- `jumlah` integer positif; `ambang` 1–100, default 80.
+- Baris baru → `201`; baris yang sudah ada atau dipulihkan dari soft delete → `200`.
+- `dibuat` menandakan insert baru. `row` berisi baris yang disimpan, `data` berisi snapshot periode terbaru.
+
+### Hapus (soft delete, idempoten)
+
+```http
+DELETE /api/anggaran/{id}
+```
+
+Mengembalikan `200` + snapshot + `dihapus: true`. DELETE berulang pada id yang sama tetap `200`. Baris yang sudah soft-deleted tidak tampil sebagai milik periode itu; gunakan `POST` untuk membuat baris periode pengganti.
+
+### Salin dari bulan sebelumnya
+
+```http
+POST /api/anggaran/salin
+```
+
+```json
+{ "periode": "2026-11" }
+```
+
+Menyalin seluruh baris anggaran dari periode terdekat sebelumnya yang tersedia. `jumlah_disalin: 0` bila periode tujuan sudah punya baris (termasuk soft-deleted) atau tidak ada periode sebelumnya. Tidak menimpa data yang ada.
+
+## Kategori
+
+```http
+GET /api/kategori
+```
+
+Read-only. Menggabungkan kategori dari transaksi tidak terhapus dan `kategori_meta` aktif. Tanpa meta, ikon memakai fallback `Icon::untukKategori()` dan warna `#496976`.
+
+```json
+{
+  "data": [
+    {
+      "kategori": "Makanan",
+      "ikon": "utensils",
+      "warna": "#A83B24",
+      "urutan": 1,
+      "ada_meta": true,
+      "mutasi": false,
+      "jumlah_transaksi": 12,
+      "total": 1873000,
+      "masuk": { "jumlah_transaksi": 0, "total": 0 },
+      "keluar": { "jumlah_transaksi": 12, "total": 1873000 }
+    },
+    {
+      "kategori": "Mutasi",
+      "ikon": "repeat",
+      "warna": "#87570F",
+      "urutan": 10,
+      "ada_meta": true,
+      "mutasi": true,
+      "jumlah_transaksi": 3,
+      "total": 1200000,
+      "masuk": { "jumlah_transaksi": 0, "total": 0 },
+      "keluar": { "jumlah_transaksi": 3, "total": 1200000 }
+    }
+  ],
+  "server_time": "2026-11-02T09:15:00"
+}
+```
+
+Urutan baris alfabetis. Ikon, warna, dan urutan tetap dikelola dari UI; tidak ada endpoint tulis kategori.
 
 ## Pengingat / transaksi berulang
 
@@ -183,9 +268,52 @@ GET /api/anggaran?periode=2026-11
 
 ```http
 GET /api/pengingat
+GET /api/pengingat?semua=1
 ```
 
-Mengembalikan jadwal aktif dengan `jatuh_tempo`, `status`, `client_key_konfirmasi`, dan `terakhir_dikonfirmasi`.
+Default hanya jadwal aktif. `semua=1` ikut menampilkan jadwal nonaktif; jadwal soft-deleted tidak pernah dikembalikan. Setiap baris memuat field jadwal, `status`, `client_key`, `client_key_konfirmasi`, `terakhir_dikonfirmasi`, dan timestamp.
+
+### Buat
+
+```http
+POST /api/pengingat
+```
+
+```json
+{
+  "nama": "Listrik PLN",
+  "kategori": "Tagihan",
+  "jumlah": 480000,
+  "aturan": "bulanan",
+  "jatuh_tempo": "2026-11-05",
+  "metode": "BSI",
+  "pencatat": "David NA",
+  "aktif": true,
+  "client_key": "TELEGRAM-123-456"
+}
+```
+
+- `kategori` dinormalisasi title case. `Mutasi` membutuhkan `metode` dan `kantong_tujuan` yang berbeda; selain Mutasi `kantong_tujuan` disimpan `null`.
+- `client_key` opsional dan idempoten. Kirim key yang sama untuk retry aman; POST berulang mengembalikan jadwal lama dengan `200` dan `dibuat: false`. Baru → `201`.
+- `client_key` yang sudah terpakai oleh jadwal soft-deleted mengembalikan baris itu apa adanya dengan `deleted_at` terisi; server tidak menghidupkannya otomatis.
+- `aktif` default `true` saat membuat.
+- `pencatat` wajib; `jumlah` integer positif.
+
+### Ubah
+
+```http
+PUT /api/pengingat/{id}
+```
+
+Kirim field yang berubah. `client_key` tidak dapat diubah dan akan ditolak `422` bila dikirim. PUT pada jadwal soft-deleted → `404`; tidak ada restore lewat PUT.
+
+### Hapus (soft)
+
+```http
+DELETE /api/pengingat/{id}
+```
+
+Respons `200` + baris dengan `deleted_at` terisi dan `dihapus: true`. DELETE berulang pada id yang sama tetap `200`.
 
 ### Konfirmasi
 

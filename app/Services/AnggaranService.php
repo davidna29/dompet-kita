@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Anggaran;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class AnggaranService
 {
@@ -73,10 +74,14 @@ class AnggaranService
     public function simpan(string $periode, ?string $kategori, int $jumlah, int $ambang = 80): Anggaran
     {
         $this->pastikanPeriode($periode);
-        $kategori = $kategori !== null ? trim($kategori) : null;
-        if ($kategori === '') {
-            $kategori = null;
+
+        if ($jumlah <= 0) {
+            throw ValidationException::withMessages([
+                'jumlah' => 'Jumlah anggaran harus lebih dari nol.',
+            ]);
         }
+
+        $kategori = $this->normalisasiKategori($kategori);
 
         $row = Anggaran::withTrashed()->firstOrNew([
             'periode' => $periode,
@@ -152,6 +157,31 @@ class AnggaranService
             'ambang' => $ambang,
             'status' => $persen >= 100 ? 'lewat' : ($persen >= $ambang ? 'hampir' : 'aman'),
         ];
+    }
+
+    private function normalisasiKategori(?string $kategori): ?string
+    {
+        $kategori = preg_replace('/\s+/u', ' ', trim((string) $kategori)) ?? '';
+
+        if ($kategori === '' || mb_strtolower($kategori) === '__total__') {
+            return null;
+        }
+
+        $kategori = mb_convert_case($kategori, MB_CASE_TITLE, 'UTF-8');
+
+        if (mb_strtolower($kategori) === 'mutasi') {
+            throw ValidationException::withMessages([
+                'kategori' => 'Mutasi bukan belanja; anggaran Mutasi tidak dihitung.',
+            ]);
+        }
+
+        if (mb_strlen($kategori) > 50) {
+            throw ValidationException::withMessages([
+                'kategori' => 'Kategori maksimal 50 karakter.',
+            ]);
+        }
+
+        return $kategori;
     }
 
     private function pastikanPeriode(string $periode): void
