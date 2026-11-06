@@ -1,13 +1,13 @@
 # AI Handoff — Dompet Kita
 
-Last updated: 2026-11-02
+Last updated: 2026-11-04
 
 ## Repository and current state
 
 - Repo: `https://github.com/davidna29/dompet-kita`
 - Branch: `main`
-- Base application commit: `315c9f5 feat: expand household finance app features`. Pushed documentation follow-up: `4fa53a7 docs: add project handoff and Hermes audit`.
-- The budget API write endpoints were added after `4fa53a7`; inspect `git status` before assuming they are committed.
+- Latest commit: `9a43f62 feat: add budget, category, and recurring APIs` (includes budget read/write, `GET /api/kategori`, and recurring CRUD with `transaksi_berulang.client_key`).
+- Working tree is clean and `main` is in sync with `origin/main`; see `git status` / `git log` to confirm.
 - `docs/rangkuman-perbaikan-dompet-kita.md` was supplied by the user and read as the Hermes audit source. Its text was preserved while the agreed findings were applied to the app.
 - Preserve the Pink Linen, account, wallet, API, animation, and documentation work summarized below.
 
