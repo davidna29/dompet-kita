@@ -16,13 +16,15 @@ class RingkasanService
 
         $dasar = Transaksi::query()->whereBetween('tanggal', [$mulaiStr, $selesaiStr]);
 
-        $masuk = (clone $dasar)->where('jenis', 'masuk')->sum('jumlah');
-        $keluar = (clone $dasar)->where('jenis', 'keluar')->where('kategori', '!=', 'Mutasi')->sum('jumlah');
+        $masuk = (clone $dasar)->where('jenis', 'masuk')->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)->sum('jumlah');
+        $keluar = (clone $dasar)->where('jenis', 'keluar')->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)->sum('jumlah');
         $mutasi = (clone $dasar)->where('kategori', 'Mutasi')->sum('jumlah');
+        $hutang = (clone $dasar)->where('jenis', 'keluar')->where('kategori', 'Hutang')->sum('jumlah');
+        $piutang = (clone $dasar)->where('jenis', 'masuk')->where('kategori', 'Piutang')->sum('jumlah');
 
         $perKategori = (clone $dasar)
             ->where('jenis', 'keluar')
-            ->where('kategori', '!=', 'Mutasi')
+            ->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)
             ->selectRaw('kategori, SUM(jumlah) as total, COUNT(*) as jumlah_transaksi')
             ->groupBy('kategori')
             ->orderByDesc('total')
@@ -36,7 +38,7 @@ class RingkasanService
 
         $perPencatat = (clone $dasar)
             ->where('jenis', 'keluar')
-            ->where('kategori', '!=', 'Mutasi')
+            ->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)
             ->selectRaw('pencatat, SUM(jumlah) as total, COUNT(*) as jumlah_transaksi')
             ->groupBy('pencatat')
             ->orderByDesc('total')
@@ -54,8 +56,10 @@ class RingkasanService
             'masuk' => (int) $masuk,
             'keluar' => (int) $keluar,
             'mutasi' => (int) $mutasi,
+            'hutang' => (int) $hutang,
+            'piutang' => (int) $piutang,
             'selisih' => (int) $masuk - (int) $keluar,
-            'jumlah_transaksi' => (clone $dasar)->where('kategori', '!=', 'Mutasi')->count(),
+            'jumlah_transaksi' => (clone $dasar)->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)->count(),
             'jumlah_mutasi' => (clone $dasar)->where('kategori', 'Mutasi')->count(),
             'per_kategori' => $perKategori,
             'per_pencatat' => $perPencatat,
@@ -99,7 +103,7 @@ class RingkasanService
         $harian = Transaksi::query()
             ->whereBetween('tanggal', [$mulaiStr, $selesaiStr])
             ->where('jenis', 'keluar')
-            ->where('kategori', '!=', 'Mutasi')
+            ->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)
             ->selectRaw('DATE(tanggal) as hari, SUM(jumlah) as total')
             ->groupBy('hari')
             ->pluck('total', 'hari');
@@ -168,14 +172,18 @@ class RingkasanService
             }
         }
 
-        $masuk = (clone $query)->where('jenis', 'masuk')->sum('jumlah');
-        $keluar = (clone $query)->where('jenis', 'keluar')->where('kategori', '!=', 'Mutasi')->sum('jumlah');
+        $masuk = (clone $query)->where('jenis', 'masuk')->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)->sum('jumlah');
+        $keluar = (clone $query)->where('jenis', 'keluar')->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)->sum('jumlah');
         $mutasi = (clone $query)->where('kategori', 'Mutasi')->sum('jumlah');
+        $hutang = (clone $query)->where('jenis', 'keluar')->where('kategori', 'Hutang')->sum('jumlah');
+        $piutang = (clone $query)->where('jenis', 'masuk')->where('kategori', 'Piutang')->sum('jumlah');
 
         return [
             'masuk' => (int) $masuk,
             'keluar' => (int) $keluar,
             'mutasi' => (int) $mutasi,
+            'hutang' => (int) $hutang,
+            'piutang' => (int) $piutang,
             'selisih' => (int) $masuk - (int) $keluar,
             'jumlah' => (clone $query)->count(),
         ];

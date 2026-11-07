@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaksi;
 use App\Models\KategoriMeta;
+use App\Models\Transaksi;
 use App\Services\AnggaranService;
 use App\Services\PengingatService;
 use App\Services\RingkasanService;
@@ -62,6 +62,7 @@ class BerandaController extends Controller
             'bulanBerjalan' => $bulan->isSameMonth(today()),
             'transaksiBaruId' => session('transaksi_baru_id'),
             'totalKantong' => $kantong->sum('saldo'),
+            'totalKantongTipe' => $saldoService->totalByTipe($kantong),
             'kategoriMeta' => $kategoriMeta,
         ]);
     }

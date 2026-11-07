@@ -64,6 +64,7 @@ class SaldoService
         return [
             'id' => $kantong->id,
             'nama' => $kantong->nama,
+            'tipe' => $kantong->tipe ?? 'harian',
             'saldo_awal' => (int) $kantong->saldo_awal,
             'tanggal_saldo_awal' => $kantong->tanggal_saldo_awal->format('Y-m-d'),
             'masuk' => (int) $masuk,
@@ -77,6 +78,29 @@ class SaldoService
     public function total(?Collection $kantong = null): int
     {
         return (int) ($kantong ?? $this->semua())->sum('saldo');
+    }
+
+    /**
+     * @return array{harian: int, tabungan: int, investasi: int}
+     */
+    public function totalByTipe(?Collection $kantong = null): array
+    {
+        $hasil = [
+            'harian' => 0,
+            'tabungan' => 0,
+            'investasi' => 0,
+        ];
+
+        foreach ($kantong ?? $this->semua() as $baris) {
+            $tipe = $baris['tipe'] ?? 'harian';
+            if (! array_key_exists($tipe, $hasil)) {
+                $tipe = 'harian';
+            }
+
+            $hasil[$tipe] += (int) $baris['saldo'];
+        }
+
+        return $hasil;
     }
 
     public function tanpaKantong(): array

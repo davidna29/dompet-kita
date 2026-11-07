@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Transaksi extends Model
 {
     use SoftDeletes;
+
+    /**
+     * Categories that move money without being household spending or income.
+     */
+    public const KATEGORI_TRANSFER = ['Mutasi', 'Hutang', 'Piutang'];
 
     protected $table = 'transaksi';
 
@@ -46,7 +52,7 @@ class Transaksi extends Model
     {
         $this->attributes['tanggal'] = $nilai instanceof \DateTimeInterface
             ? $nilai->format('Y-m-d')
-            : \Carbon\Carbon::parse((string) $nilai)->toDateString();
+            : Carbon::parse((string) $nilai)->toDateString();
     }
 
     public function scopePeriode(Builder $query, string $mulai, string $selesai): Builder
@@ -56,7 +62,7 @@ class Transaksi extends Model
 
     public function scopeBelanja(Builder $query): Builder
     {
-        return $query->where('kategori', '!=', 'Mutasi');
+        return $query->whereNotIn('kategori', self::KATEGORI_TRANSFER);
     }
 
     public function scopeMutasi(Builder $query): Builder

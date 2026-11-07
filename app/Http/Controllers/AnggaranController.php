@@ -19,7 +19,7 @@ class AnggaranController extends Controller
         $hasil = $service->untukPeriode($periode);
 
         $kategori = Transaksi::query()
-            ->where('kategori', '!=', 'Mutasi')
+            ->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)
             ->distinct()
             ->orderBy('kategori')
             ->pluck('kategori');
