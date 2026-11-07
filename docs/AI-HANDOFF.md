@@ -6,10 +6,10 @@ Last updated: 2026-11-06
 
 - Repo: `https://github.com/davidna29/dompet-kita`
 - Base branch: `main` at `9dfc31b docs: sync AI handoff with latest API commits`.
-- Work in progress branch: `feat/kantong-tipe-hutang` — pocket types and debts/receivables (FR-023). Not yet committed or merged when this note was written; run `git status` / `git log` to confirm.
+- Active branch: `feat/kantong-tipe-hutang` — pocket types and debts/receivables (FR-023). Committed and pushed; pull request: https://github.com/davidna29/dompet-kita/pull/1
+- Commits on the branch: `232bdb0` core schema/services, `dec106b` UI, `4e78e30` docs/PRD v0.4.
 - `main` includes budget read/write, `GET /api/kategori`, and recurring CRUD with `transaksi_berulang.client_key` (`9a43f62`).
-- Untracked `docs/fitur-hutang-kantong.md` is the user-supplied implementation prompt for this branch; keep it until the work is merged.
-- `docs/rangkuman-perbaikan-dompet-kita.md` was supplied by the user and read as the Hermes audit source. Its text was preserved while the agreed findings were applied to the app.
+- `docs/fitur-hutang-kantong.md` is the user-supplied implementation prompt for this branch and is now tracked in the repo.
 - `docs/rangkuman-perbaikan-dompet-kita.md` was supplied by the user and read as the Hermes audit source. Its text was preserved while the agreed findings were applied to the app.
 - Preserve the Pink Linen, account, wallet, API, animation, and documentation work summarized below.
 
@@ -73,10 +73,10 @@ Last updated: 2026-11-06
 
 ## Pending / before release
 
-0. **Branch `feat/kantong-tipe-hutang` still needs review, commit, and merge.** Visual QA for the new Hutang pages and the Kantong type filter/badges is pending on desktop and 360 px, light/dark and both palettes.
+0. **PR #1 (`feat/kantong-tipe-hutang`) is open and needs review/merge.** Visual QA for the new Hutang pages and the Kantong type filter/badges is pending on desktop and 360 px, light/dark and both palettes.
 1. **Visual QA is still pending for this motion pass:** inspect desktop and 360 px, both light/dark and Olive/Pink Linen, toast close/auto-dismiss, dialog/disclosure, loading, hover/focus, and Reduce Motion; check console and horizontal overflow. The existing Chrome window was on a `Tambah jadwal` form, so it was left untouched rather than navigated away. Check with the user or use a separate safe browser context.
-2. **Hostinger API auth is still unresolved:** `/api/health` returns 401. Rotate the exposed `ADMIN_TOKEN`, refresh `config:cache`, confirm the Authorization header reaches PHP, and confirm `index.php` serves the same app instance as Tinker. The budget, category, and recurring APIs cannot be used by Hermes until this passes.
-3. Run `php artisan migrate --force` on Hostinger for the new `transaksi_berulang.client_key` column before using the recurring API.
+2. **Hostinger API auth is still unresolved:** `/api/health` returns 401. Rotate the exposed `ADMIN_TOKEN`, refresh `config:cache`, confirm the Authorization header reaches PHP, and confirm `index.php` serves the same app instance as Tinker. The budget, category, recurring, and hutang APIs cannot be used by Hermes until this passes.
+3. Run `php artisan migrate --force` on Hostinger for `transaksi_berulang.client_key`, `kantong.tipe`, and `hutang_piutang` before using the recurring and hutang features.
 4. Perform production deployment checks: `APP_ENV=production`, `APP_DEBUG=false`, HTTPS `APP_URL`, `SESSION_SECURE_COOKIE=true`, strong `ADMIN_TOKEN` kept only in environment, and `DEMO_MODE=false`.
 5. For a fresh production DB with no users present during the role migration, provision the first two accounts as admins. README contains a Tinker example; replace its sample emails with the real account emails.
 6. The real 19-row CSV is absent from the repo; import comparison remains pending until the source CSV is available.
