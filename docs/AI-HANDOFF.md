@@ -1,17 +1,28 @@
 # AI Handoff — Dompet Kita
 
-Last updated: 2026-11-04
+Last updated: 2026-11-06
 
 ## Repository and current state
 
 - Repo: `https://github.com/davidna29/dompet-kita`
-- Branch: `main`
-- Latest commit: `9a43f62 feat: add budget, category, and recurring APIs` (includes budget read/write, `GET /api/kategori`, and recurring CRUD with `transaksi_berulang.client_key`).
-- Working tree is clean and `main` is in sync with `origin/main`; see `git status` / `git log` to confirm.
+- Base branch: `main` at `9dfc31b docs: sync AI handoff with latest API commits`.
+- Work in progress branch: `feat/kantong-tipe-hutang` — pocket types and debts/receivables (FR-023). Not yet committed or merged when this note was written; run `git status` / `git log` to confirm.
+- `main` includes budget read/write, `GET /api/kategori`, and recurring CRUD with `transaksi_berulang.client_key` (`9a43f62`).
+- Untracked `docs/fitur-hutang-kantong.md` is the user-supplied implementation prompt for this branch; keep it until the work is merged.
+- `docs/rangkuman-perbaikan-dompet-kita.md` was supplied by the user and read as the Hermes audit source. Its text was preserved while the agreed findings were applied to the app.
 - `docs/rangkuman-perbaikan-dompet-kita.md` was supplied by the user and read as the Hermes audit source. Its text was preserved while the agreed findings were applied to the app.
 - Preserve the Pink Linen, account, wallet, API, animation, and documentation work summarized below.
 
 ## Implemented
+
+### Pocket types and debts/receivables (branch `feat/kantong-tipe-hutang`)
+
+- `kantong.tipe` is a plain string restricted by validation to `harian`, `tabungan`, `investasi` (not a MySQL ENUM, so SQLite tests stay compatible). The migration defaults existing rows to `harian`. `GET /api/kantong` now includes `tipe`; `SaldoService::totalByTipe()` groups balances.
+- The Kantong UI shows a type badge, a type filter, and three totals (harian/tabungan/investasi). Create/edit accepts `tipe`; rename/archive behaviour is unchanged.
+- FR-023 `hutang_piutang` table and `HutangService`: creating a record never creates a transaction. `bayar()` locks the row, creates the transaction through `TransaksiService` (bayar hutang = `keluar` + `Hutang`; terima piutang = `masuk` + `Piutang`), reduces `sisa`, and sets `lunas` at zero. Idempotent through `HUTANG-<id>-<YYYYMMDD>-<jumlah>`.
+- API: `GET /api/hutang` (filter `jenis`/`status`), `POST /api/hutang`, `POST /api/hutang/{id}/bayar`, `DELETE /api/hutang/{id}` (soft, idempotent). Web: Hutang list, create, detail/payment, soft delete.
+- `Transaksi::KATEGORI_TRANSFER` now holds `Mutasi`, `Hutang`, `Piutang`. All spending/income totals, per-category charts, daily cumulative, and budget usage exclude them; pocket balances still include every transaction. Budget writes reject all three transfer categories.
+- PRD raised to v0.4 (FR-023 moves to Should/Tahap 2b), and `README`, `PRODUCT.md`, `AGENTS.md`, `docs/api.md` were updated.
 
 ### Themes and motion
 
@@ -53,7 +64,7 @@ Last updated: 2026-11-04
 
 ## Verification already completed
 
-- `herd php artisan test`: **81 passed, 417 assertions** (includes `ApiAnggaranTest`, `ApiKategoriTest`, and `ApiPengingatTest`).
+- `herd php artisan test`: **97 passed, 502 assertions** (includes `ApiAnggaranTest`, `ApiKategoriTest`, `ApiPengingatTest`, `ApiHutangTest`, and `KantongTipeTest`).
 - `npm run build`: passed.
 - Pint `--test` on changed PHP files: passed.
 - `git diff --check`: passed.
@@ -62,6 +73,7 @@ Last updated: 2026-11-04
 
 ## Pending / before release
 
+0. **Branch `feat/kantong-tipe-hutang` still needs review, commit, and merge.** Visual QA for the new Hutang pages and the Kantong type filter/badges is pending on desktop and 360 px, light/dark and both palettes.
 1. **Visual QA is still pending for this motion pass:** inspect desktop and 360 px, both light/dark and Olive/Pink Linen, toast close/auto-dismiss, dialog/disclosure, loading, hover/focus, and Reduce Motion; check console and horizontal overflow. The existing Chrome window was on a `Tambah jadwal` form, so it was left untouched rather than navigated away. Check with the user or use a separate safe browser context.
 2. **Hostinger API auth is still unresolved:** `/api/health` returns 401. Rotate the exposed `ADMIN_TOKEN`, refresh `config:cache`, confirm the Authorization header reaches PHP, and confirm `index.php` serves the same app instance as Tinker. The budget, category, and recurring APIs cannot be used by Hermes until this passes.
 3. Run `php artisan migrate --force` on Hostinger for the new `transaksi_berulang.client_key` column before using the recurring API.

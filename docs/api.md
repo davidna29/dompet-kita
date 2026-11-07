@@ -133,6 +133,7 @@ GET /api/kantong
     {
       "id": 1,
       "nama": "BSI",
+      "tipe": "harian",
       "saldo_awal": 4750000,
       "tanggal_saldo_awal": "2026-06-01",
       "masuk": 51625000,
@@ -146,7 +147,7 @@ GET /api/kantong
 }
 ```
 
-Saldo dihitung server. Jangan menghitung ulang dari CSV untuk laporan.
+`tipe` berisi `harian`, `tabungan`, atau `investasi`. Saldo dihitung server. Jangan menghitung ulang dari CSV untuk laporan.
 
 Rename kantong dari UI memperbarui `metode` dan `kantong_tujuan` pada semua transaksi (termasuk soft-deleted) serta jadwal berulang. Perubahan transaksi mencatat riwayat dan memperbarui `updated_at`, sehingga tersedia untuk STB melalui `GET /api/transaksi?since=`. Kantong arsip dikeluarkan dari daftar saldo aktif; referensi historisnya tetap dikenali.
 
@@ -336,6 +337,91 @@ POST /api/pengingat/{id}/konfirmasi
 - Konfirmasi ulang untuk jatuh tempo yang sama → `200` + baris lama, `dibuat: false`.
 - Transaksi baru memakai `sumber=telegram` saat dipanggil dari STB.
 
+## Hutang dan piutang
+
+Catatan pinjaman keluarga. Membuat catatan **tidak** membuat transaksi; transaksi baru lahir saat pembayaran dikonfirmasi dan memakai kategori `Hutang` (bayar hutang, `jenis=keluar`) atau `Piutang` (terima piutang, `jenis=masuk`). Kedua kategori dikecualikan dari total belanja dan pemasukan, tetapi tetap mengubah saldo kantong.
+
+### Daftar
+
+```http
+GET /api/hutang?jenis=hutang&status=belum
+```
+
+`jenis` opsional: `hutang`/`piutang`. `status` opsional: `belum`/`lunas`. Jadwal soft-deleted tidak dikembalikan.
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "pihak": "Pak Andi",
+      "jenis": "hutang",
+      "nominal": 500000,
+      "sisa": 300000,
+      "tanggal": "2026-11-06",
+      "jatuh_tempo": "2026-12-06",
+      "status": "belum",
+      "keterangan": "Pinjam servis motor",
+      "created_at": "2026-11-06T08:00:00",
+      "updated_at": "2026-11-06T08:00:00",
+      "deleted_at": null
+    }
+  ],
+  "server_time": "2026-11-06T09:15:00"
+}
+```
+
+### Buat
+
+```http
+POST /api/hutang
+```
+
+```json
+{
+  "pihak": "Pak Andi",
+  "jenis": "hutang",
+  "nominal": 500000,
+  "tanggal": "2026-11-06",
+  "jatuh_tempo": "2026-12-06",
+  "keterangan": "Pinjam servis motor"
+}
+```
+
+- `pihak` wajib, maksimal 50 karakter.
+- `jenis` hanya `hutang` atau `piutang`.
+- `nominal` bilangan bulat positif; `sisa` awal = `nominal`; `status` = `belum`.
+- Baru → `201` + `{data, server_time}`. Tidak ada endpoint ubah; koreksi dilakukan dengan hapus lunak lalu buat ulang.
+
+### Bayar / terima
+
+```http
+POST /api/hutang/{id}/bayar
+```
+
+```json
+{
+  "jumlah": 200000,
+  "tanggal": "2026-11-06",
+  "metode": "BSI",
+  "keterangan": "Cicilan pertama",
+  "pencatat": "David NA"
+}
+```
+
+- `jumlah` tidak boleh melebihi `sisa`; catatan yang sudah lunas ditolak `422`.
+- `client_key` dibuat server: `HUTANG-<id>-<YYYYMMDD>-<jumlah>`. Konfirmasi ulang dengan tanggal dan jumlah yang sama mengembalikan transaksi lama (`200`, `dibuat: false`) tanpa mengurangi `sisa` dua kali.
+- Pembayaran pertama → `201` + `{data, transaksi, dibuat: true, server_time}`.
+- `sisa` berkurang; `status` menjadi `lunas` saat `sisa` mencapai 0.
+
+### Hapus (soft)
+
+```http
+DELETE /api/hutang/{id}
+```
+
+`200` + `{data, dihapus: true}`. DELETE berulang tetap `200`. Transaksi pembayaran yang sudah tercatat tidak ikut dihapus.
+
 ## Pemetaan CSV STB
 
 Header tetap:
@@ -347,4 +433,4 @@ tanggal,jenis,kategori,jumlah,keterangan,pencatat,metode,kantong_tujuan
 - `jumlah` digit polos.
 - `kantong_tujuan` kosong untuk non-Mutasi.
 - Baris `deleted_at` tidak dibuang; tandai di CSV dan pertahankan sampai backup bulanan.
-- Laporan belanja mengecualikan kategori `Mutasi`; saldo kantong memasukkannya.
+- Laporan belanja dan pemasukan mengecualikan kategori `Mutasi`, `Hutang`, dan `Piutang`; saldo kantong tetap menghitung semua transaksi.

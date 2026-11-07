@@ -15,7 +15,8 @@ php artisan transaksi:impor-csv <path> [--dry-run]
 
 - `jenis` hanya `masuk` / `keluar`. Jangan menambah nilai baru.
 - Mutasi = `jenis=keluar` + `kategori=Mutasi`; `metode` = asal, `kantong_tujuan` = tujuan, keduanya wajib dan berbeda.
-- Semua total belanja/pengeluaran mengecualikan Mutasi. Saldo kantong memasukkan Mutasi.
+- Semua total belanja/pengeluaran mengecualikan Mutasi, Hutang, dan Piutang. Saldo kantong memasukkan semua transaksi.
+- Hutang/Piutang (FR-023): catatan tidak membuat transaksi; transaksi lahir saat bayar/terima dengan `kategori=Hutang`/`Piutang` dan `client_key=HUTANG-<id>-<YYYYMMDD>-<jumlah>`.
 - `jumlah` selalu bilangan bulat positif, disimpan digit polos (INT), bukan string berformat.
 - Penghapusan selalu soft delete. Jangan membuat hapus permanen dari UI.
 - `client_key` UNIQUE dan idempoten. POST dengan key sama mengembalikan baris lama.
