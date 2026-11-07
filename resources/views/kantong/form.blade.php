@@ -10,7 +10,7 @@
                     <x-icon name="arrow-left" class="size-3.5" />
                     Kembali ke kantong
                 </a>
-                <h1 class="page-title">{{ $kantong ? 'Ubah nama kantong' : 'Tambah kantong' }}</h1>
+                <h1 class="page-title">{{ $kantong ? 'Ubah kantong' : 'Tambah kantong' }}</h1>
                 <p class="page-sub">
                     {{ $kantong
                         ? 'Nama baru diterapkan juga pada transaksi dan jadwal terkait. Riwayat perubahan tetap tercatat.'
@@ -30,6 +30,16 @@
                     <label for="nama" class="label">Nama kantong</label>
                     <input id="nama" name="nama" type="text" value="{{ old('nama', $kantong?->nama) }}" maxlength="30" required autofocus class="input mt-1.5" placeholder="Contoh: Tunai, BSI, Bank utama">
                     @error('nama') <p class="mt-1.5 text-sm font-semibold text-tomato">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="mt-4">
+                    <label for="tipe" class="label">Tipe kantong</label>
+                    <select id="tipe" name="tipe" class="input mt-1.5">
+                        @foreach(['harian' => 'Harian', 'tabungan' => 'Tabungan', 'investasi' => 'Investasi'] as $nilai => $label)
+                            <option value="{{ $nilai }}" @selected(old('tipe', $kantong?->tipe ?? 'harian') === $nilai)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('tipe') <p class="mt-1.5 text-sm font-semibold text-tomato">{{ $message }}</p> @enderror
                 </div>
 
                 @unless($kantong)
@@ -55,7 +65,7 @@
             <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <a href="{{ route('kantong') }}" class="btn btn-ghost">Batal</a>
                 <button type="submit" class="btn btn-primary">
-                    {{ $kantong ? 'Simpan nama kantong' : 'Tambah kantong' }}
+                    {{ $kantong ? 'Simpan kantong' : 'Tambah kantong' }}
                 </button>
             </div>
         </form>

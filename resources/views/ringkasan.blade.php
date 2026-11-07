@@ -24,7 +24,7 @@
         <header class="page-head">
             <div>
                 <h1 class="page-title">Ringkasan</h1>
-                <p class="page-sub">{{ $labelPeriode }} · total belanja tanpa Mutasi, angka yang sama dengan laporan Hermes.</p>
+                <p class="page-sub">{{ $labelPeriode }} · total belanja tanpa Mutasi, Hutang, dan Piutang — angka yang sama dengan laporan Hermes.</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('transaksi.ekspor', $filterExport) }}" class="btn btn-ghost btn-sm">
@@ -101,6 +101,16 @@
             </div>
         </section>
 
+        @if(($ringkasan['hutang'] ?? 0) > 0 || ($ringkasan['piutang'] ?? 0) > 0)
+            <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-paper px-4 py-3 text-xs">
+                <p class="text-muted">Hutang dan piutang tidak masuk belanja atau pemasukan.</p>
+                <p class="flex flex-wrap gap-3 font-semibold">
+                    <span class="text-tomato">Bayar hutang {{ rupiah($ringkasan['hutang'] ?? 0) }}</span>
+                    <span class="text-sage">Terima piutang {{ rupiah($ringkasan['piutang'] ?? 0) }}</span>
+                </p>
+            </div>
+        @endif
+
         @if($perbandingan)
             <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-paper px-4 py-3">
                 <p class="text-xs text-muted">Dibanding {{ bulan_id($perbandingan['bulan_sebelumnya']) }}</p>
@@ -122,7 +132,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <h2 class="font-display text-lg font-semibold">Ke mana uang pergi</h2>
-                        <p class="mt-0.5 text-xs text-muted">Kategori belanja · Mutasi tidak dihitung.</p>
+                        <p class="mt-0.5 text-xs text-muted">Kategori belanja · Mutasi, Hutang, dan Piutang tidak dihitung.</p>
                     </div>
                     <div class="text-right">
                         <p class="label">Total belanja</p>

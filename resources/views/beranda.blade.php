@@ -49,7 +49,7 @@
                 <div class="flex items-start justify-between gap-4 border-b border-line pb-4">
                     <div>
                         <h2 class="font-display text-lg font-semibold tracking-[-0.02em]">Papan bulan ini</h2>
-                        <p class="mt-1 text-xs text-muted">Pengeluaran belanja, tanpa Mutasi.</p>
+                        <p class="mt-1 text-xs text-muted">Pengeluaran belanja, tanpa Mutasi, Hutang, dan Piutang.</p>
                     </div>
                     <span class="month-tab {{ $bulanBerjalan ? 'month-tab--aktif' : '' }}">{{ strtoupper(bulan_singkat($bulan)) }} {{ $bulan->year }}</span>
                 </div>
@@ -95,7 +95,7 @@
                 <div class="mt-5 border-t border-line pt-4">
                     <div class="flex items-center justify-between gap-3">
                         <p class="label">Enam bulan terakhir</p>
-                        <p class="text-[10px] text-muted">Pengeluaran non-Mutasi</p>
+                        <p class="text-[10px] text-muted">Belanja tanpa Mutasi/Hutang/Piutang</p>
                     </div>
                     <div class="mt-3 flex h-24 items-end gap-2" role="img" aria-label="Grafik pengeluaran enam bulan terakhir">
                         @foreach($tren as $index => $titik)
@@ -122,6 +122,14 @@
                         <a href="{{ route('kantong') }}" class="link-aksi">Lihat</a>
                     </div>
                     <p class="amount mt-3 text-xl">{{ rupiah($totalKantong) }}</p>
+                    <div class="mt-2 grid grid-cols-3 gap-2 text-[10px]">
+                        @foreach(['harian' => 'Harian', 'tabungan' => 'Tabungan', 'investasi' => 'Investasi'] as $kunci => $label)
+                            <div class="rounded-lg bg-canvas px-2 py-1.5">
+                                <span class="block text-muted">{{ $label }}</span>
+                                <span class="amount block">{{ rupiah($totalKantongTipe[$kunci]) }}</span>
+                            </div>
+                        @endforeach
+                    </div>
                     <div class="mt-3 divide-y divide-line border-t border-line">
                         @foreach($kantong as $k)
                             <a href="{{ route('transaksi.index', ['metode' => $k['nama'], 'semua' => 1]) }}" class="flex items-center justify-between gap-3 py-2">

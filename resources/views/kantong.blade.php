@@ -35,9 +35,25 @@
             <div class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
                 <div>
                     <h2 class="font-display text-lg font-semibold">Saldo semua kantong</h2>
-                    <p class="mt-1 text-xs text-muted">Tunai · BSI · Shopee · sampai hari ini</p>
+                    <p class="mt-1 text-xs text-muted">Sampai hari ini, termasuk Mutasi</p>
                 </div>
                 <p class="amount text-2xl sm:text-3xl">{{ rupiah($total) }}</p>
+            </div>
+
+            <div class="grid grid-cols-3 divide-x divide-line border-b border-line py-3 text-center">
+                @foreach(['harian' => 'Harian', 'tabungan' => 'Tabungan', 'investasi' => 'Investasi'] as $kunci => $label)
+                    <div class="px-2">
+                        <p class="label">{{ $label }}</p>
+                        <p class="amount mt-1 text-sm sm:text-base">{{ rupiah($totalTipe[$kunci]) }}</p>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 border-b border-line py-3">
+                <a href="{{ route('kantong') }}" class="chip {{ $filterTipe === null ? 'chip-aktif' : '' }}">Semua</a>
+                @foreach(['harian' => 'Harian', 'tabungan' => 'Tabungan', 'investasi' => 'Investasi'] as $kunci => $label)
+                    <a href="{{ route('kantong', ['tipe' => $kunci]) }}" class="chip {{ $filterTipe === $kunci ? 'chip-aktif' : '' }}">{{ $label }}</a>
+                @endforeach
             </div>
 
             <div class="divide-y divide-line">
@@ -50,6 +66,7 @@
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <h3 class="text-sm font-bold">{{ $k['nama'] }}</h3>
+                                    <span class="tag {{ $k['tipe'] === 'tabungan' ? 'tag--masuk' : ($k['tipe'] === 'investasi' ? 'tag--mutasi' : '') }}">{{ ucfirst($k['tipe']) }}</span>
                                     <span class="label !text-[9px]">sejak {{ tanggal_id($k['tanggal_saldo_awal']) }}</span>
                                 </div>
                                 <p class="mt-1 text-[11px] leading-relaxed text-muted">
@@ -124,7 +141,7 @@
                 <form method="POST" action="{{ route('kantong.saldo-awal') }}" class="border-t border-line px-4 py-4 sm:px-5">
                     @csrf
                     <div class="space-y-4">
-                        @foreach($kantong as $k)
+                        @foreach($kantongSemua as $k)
                             <div class="grid gap-2 sm:grid-cols-[120px_1fr_180px] sm:items-end">
                                 <p class="text-sm font-semibold sm:pb-2.5">{{ $k['nama'] }}</p>
                                 <div>
@@ -219,7 +236,7 @@
 
                 <form method="POST" action="{{ route('kantong.rekonsiliasi') }}" class="mt-4 space-y-3">
                     @csrf
-                    @foreach($kantong as $k)
+                    @foreach($kantongSemua as $k)
                         @php $hasilBaris = $hasilRekonsiliasi->get($k['id']); @endphp
                         <div>
                             <label for="saldo-{{ $k['id'] }}" class="label">{{ $k['nama'] }} — saldo nyata</label>
