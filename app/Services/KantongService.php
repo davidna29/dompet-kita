@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class KantongService
 {
+    public const TIPE = ['harian', 'tabungan', 'investasi'];
+
     public function __construct(
         private readonly SaldoService $saldoService,
         private readonly TransaksiService $transaksiService,
@@ -129,6 +131,21 @@ class KantongService
 
             $terkunci->update(['nama' => $namaBaru]);
         });
+    }
+
+    public function ubahTipe(Kantong $kantong, string $tipe): void
+    {
+        if (! in_array($tipe, self::TIPE, true)) {
+            throw ValidationException::withMessages([
+                'tipe' => 'Tipe kantong tidak valid.',
+            ]);
+        }
+
+        if ($kantong->tipe === $tipe) {
+            return;
+        }
+
+        $kantong->forceFill(['tipe' => $tipe])->save();
     }
 
     public function arsipkan(Kantong $kantong): void

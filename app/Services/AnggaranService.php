@@ -169,9 +169,15 @@ class AnggaranService
 
         $kategori = mb_convert_case($kategori, MB_CASE_TITLE, 'UTF-8');
 
-        if (mb_strtolower($kategori) === 'mutasi') {
+        if ($kategori === 'Mutasi') {
             throw ValidationException::withMessages([
                 'kategori' => 'Mutasi bukan belanja; anggaran Mutasi tidak dihitung.',
+            ]);
+        }
+
+        if (in_array($kategori, ['Hutang', 'Piutang'], true)) {
+            throw ValidationException::withMessages([
+                'kategori' => $kategori.' bukan belanja; anggaran kategori ini tidak dihitung.',
             ]);
         }
 

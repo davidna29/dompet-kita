@@ -45,7 +45,7 @@
                         <span class="month-tab month-tab--aktif !h-7">NOVEMBER</span>
                     </div>
                     <div class="pt-4">
-                        <p class="text-xs text-muted">Pengeluaran · Mutasi tidak dihitung</p>
+                        <p class="text-xs text-muted">Pengeluaran · Mutasi, Hutang, Piutang tidak dihitung</p>
                         <p class="amount mt-1 text-[clamp(2rem,3.2vw,2.8rem)] leading-none">Rp4.812.000</p>
                     </div>
                     <div class="mt-4 grid grid-cols-3 gap-3 border-t border-line pt-3">

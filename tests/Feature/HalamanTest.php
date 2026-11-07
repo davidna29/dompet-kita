@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\HutangPiutang;
 use App\Models\Kantong;
 use App\Models\User;
 use App\Services\TransaksiService;
@@ -33,11 +34,48 @@ class HalamanTest extends TestCase
             '/anggaran',
             '/berulang',
             '/berulang/baru',
+            '/hutang',
+            '/hutang/baru',
             '/kategori',
             '/pengaturan',
         ] as $url) {
             $this->get($url)->assertOk();
         }
+    }
+
+    public function test_hutang_dapat_dicatat_dan_dibayar_dari_ui(): void
+    {
+        $user = User::factory()->create(['pencatat' => 'David NA']);
+        $this->actingAs($user);
+
+        $this->post('/hutang', [
+            'pihak' => 'Pak Andi',
+            'jenis' => 'hutang',
+            'nominal' => '500.000',
+            'tanggal' => today()->toDateString(),
+            'jatuh_tempo' => today()->addDays(30)->toDateString(),
+        ])->assertRedirect();
+
+        $hutang = HutangPiutang::query()->firstOrFail();
+        $this->assertSame(500_000, $hutang->sisa);
+
+        $this->get('/hutang/'.$hutang->id)->assertOk();
+
+        $this->post('/hutang/'.$hutang->id.'/bayar', [
+            'jumlah' => '200.000',
+            'tanggal' => today()->toDateString(),
+            'metode' => 'BSI',
+        ])->assertRedirect(route('hutang.show', $hutang));
+
+        $hutang->refresh();
+        $this->assertSame(300_000, $hutang->sisa);
+        $this->assertDatabaseHas('transaksi', [
+            'jenis' => 'keluar',
+            'kategori' => 'Hutang',
+            'jumlah' => 200_000,
+            'pencatat' => 'David NA',
+            'metode' => 'BSI',
+        ]);
     }
 
     public function test_ekspor_csv_memakai_header_stb_dan_digit_polos(): void
