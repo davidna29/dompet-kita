@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\BerulangController;
 use App\Http\Controllers\EksporController;
+use App\Http\Controllers\HutangController;
 use App\Http\Controllers\KantongController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PengaturanController;
@@ -54,6 +55,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/berulang/{berulang}', [BerulangController::class, 'update'])->name('berulang.update');
     Route::delete('/berulang/{berulang}', [BerulangController::class, 'destroy'])->name('berulang.destroy');
     Route::post('/berulang/{berulang}/konfirmasi', [BerulangController::class, 'konfirmasi'])->name('berulang.konfirmasi');
+
+    Route::get('/hutang', [HutangController::class, 'index'])->name('hutang.index');
+    Route::get('/hutang/baru', [HutangController::class, 'create'])->name('hutang.create');
+    Route::post('/hutang', [HutangController::class, 'store'])->name('hutang.store');
+    Route::get('/hutang/{hutang}', [HutangController::class, 'show'])->name('hutang.show');
+    Route::post('/hutang/{hutang}/bayar', [HutangController::class, 'bayar'])->name('hutang.bayar');
+    Route::delete('/hutang/{hutang}', [HutangController::class, 'destroy'])->name('hutang.destroy');
 
     Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');

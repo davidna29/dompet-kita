@@ -6,22 +6,23 @@ Dokumen produk dan aturan nilai: [`docs/prd-ok.md`](docs/prd-ok.md). Kontrak API
 
 ## Yang sudah dibangun
 
-Tahap 1 dan Tahap 2 (FR-001 sampai FR-020):
+Tahap 1, Tahap 2, dan Tahap 2b (FR-001 sampai FR-020 plus FR-023):
 
 - login dengan rate limit 5 percobaan/menit/IP; David dan Nurul menjadi pengelola akun awal, anggota baru dibuat dari Pengaturan;
 - daftar transaksi dengan filter tanggal, jenis, kategori, pencatat, dan kantong;
 - tambah, ubah, dan hapus lunak; riwayat perubahan; nomor client_key untuk idempotensi;
 - ringkasan periode, grafik donat/batang/kumulatif, dan perbandingan bulan lalu;
-- saldo per kantong, tambah/rename/arsip kantong (arsip hanya saat saldo nol dan tanpa jadwal aktif), rumus server, rekonsiliasi tanpa penyesuaian otomatis;
+- saldo per kantong dengan tipe harian/tabungan/investasi, tambah/rename/arsip kantong (arsip hanya saat saldo nol dan tanpa jadwal aktif), rumus server, rekonsiliasi tanpa penyesuaian otomatis;
+- hutang dan piutang (FR-023): catatan pihak, nominal, sisa, jatuh tempo, pembayaran/cicilan; transaksi baru dibuat saat pembayaran dikonfirmasi dan memakai kategori `Hutang`/`Piutang` yang tidak dihitung sebagai belanja atau pemasukan;
 - anggaran per kategori dan total, ambang 80%/100%, salinan bulan lalu; API baca/tulis anggaran untuk Hermes;
 - jadwal berulang dan konfirmasi tagihan satu ketukan; API baca/tulis jadwal dengan `client_key` idempoten;
 - ikon, warna, dan urutan kategori; saran cepat kategori pemasukan Gaji, Honor, Upah, Bonus, Hadiah, dan Proyek; `GET /api/kategori` read-only untuk Hermes;
 - pengelolaan akun keluarga: pengelola menambah anggota; anggota baru tidak mendapat hak kelola akun;
 - ekspor CSV dengan header STB, impor CSV migrasi 19 baris;
-- API Bearer token untuk Hermes, termasuk soft-deleted di `since` dan `GET/POST/DELETE /api/anggaran` serta salin periode;
+- API Bearer token untuk Hermes, termasuk soft-deleted di `since`, `GET/POST/DELETE /api/anggaran` serta salin periode, dan `GET/POST /api/hutang`, `POST /api/hutang/{id}/bayar`, `DELETE /api/hutang/{id}`;
 - PWA + mode gelap, online-only; service worker hanya menyimpan aset statis.
 
-Could (target tabungan, hutang/piutang, kalender, pencarian, tag, PDF/Excel, foto struk) belum dibangun sesuai PRD.
+Could (target tabungan, kalender, pencarian, tag, PDF/Excel, foto struk) belum dibangun sesuai PRD.
 
 ## Kebutuhan
 
@@ -68,7 +69,7 @@ Kedua akun demo adalah pengelola. Akun anggota yang dibuat dari **Pengaturan** m
 ## Perintah penting
 
 ```bash
-php artisan test                         # 81 tes: API, WIB, Mutasi, saldo, idempotensi, impor, kantong, akun, anggaran, kategori, berulang
+php artisan test                         # 97 tes: API, WIB, Mutasi, saldo, idempotensi, impor, kantong, akun, anggaran, kategori, berulang, hutang
 php artisan migrate --force              # produksi
 php artisan db:seed --class=DemoSeeder   # hanya lokal, data sintetis
 php artisan transaksi:impor-csv path/to/transaksi.csv --dry-run
@@ -148,7 +149,7 @@ Tidak ada worker permanen, Redis, websocket, atau queue daemon. Gunakan `QUEUE_C
 
 - `jenis` hanya `masuk` dan `keluar`.
 - Mutasi = `jenis=keluar` + `kategori=Mutasi` + `metode` asal + `kantong_tujuan` tujuan yang berbeda.
-- Total belanja selalu mengecualikan Mutasi; saldo kantong memasukkan Mutasi.
+- Total belanja dan pemasukan mengecualikan Mutasi, Hutang, dan Piutang; saldo kantong tetap mengikuti semua transaksi.
 - `jumlah` selalu bilangan bulat positif digit polos; tanda ditentukan `jenis`.
 - Penghapusan selalu soft delete; baris tetap muncul di API `since`.
 - `client_key` unik dan idempoten; `updated_at` ditetapkan server.
@@ -157,9 +158,9 @@ Tidak ada worker permanen, Redis, websocket, atau queue daemon. Gunakan `QUEUE_C
 ## Struktur singkat
 
 - `app/Http/Controllers` — halaman dan API
-- `app/Services` — aturan transaksi, saldo, ringkasan, anggaran, pengingat
+- `app/Services` — aturan transaksi, saldo, ringkasan, anggaran, pengingat, hutang
 - `app/Livewire` — komponen form transaksi (Livewire 4 single-file di `resources/views/components/⚡transaksi-form.blade.php`)
-- `database/migrations` — skema `transaksi`, `kantong`, `anggaran`, `transaksi_berulang`, `transaksi_riwayat`, `kategori_meta`
+- `database/migrations` — skema `transaksi`, `kantong`, `anggaran`, `transaksi_berulang`, `transaksi_riwayat`, `kategori_meta`, `hutang_piutang`
 - `resources/css/app.css` — token Papan Dapur, komponen, mode gelap
 - `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html` — PWA online-only
 - `tests` — kontrak API dan aturan nilai
@@ -170,7 +171,7 @@ Arah visual: **Papan Dapur** — krem kapur, zaitun, tomat, oker, tipografi Bric
 
 ## Verifikasi rilis
 
-- `php artisan test` — 81 tes, 417 assertion (API, WIB/`since`, idempotensi, Mutasi, saldo, anggaran baca/tulis, kategori, jadwal berulang, impor, login throttle).
+- `php artisan test` — 97 tes, 502 assertion (API, WIB/`since`, idempotensi, Mutasi, saldo, anggaran baca/tulis, kategori, jadwal berulang, hutang/piutang, impor, login throttle).
 - `impeccable detect` pada `resources/views`, `resources/css`, `resources/js` — 0 temuan.
 - Tangkapan 390 dan 1440, termasuk mode gelap, ada di `.impeccable/review/`.
 - PWA PNG di `public/icons/` membawa provenance yang disematkan. `public/favicon.ico` dihasilkan dari `favicon-32.png` oleh `scripts/make-favicon.php`.

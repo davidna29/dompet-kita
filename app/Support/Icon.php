@@ -115,6 +115,8 @@ class Icon
             'gaji', 'honor', 'upah', 'bonus', 'pemasukan' => 'bank',
             'usaha', 'proyek' => 'sparkles',
             'mutasi' => 'repeat',
+            'hutang' => 'arrow-down-left',
+            'piutang' => 'arrow-up-right',
             'tabungan' => 'piggy-bank',
             default => 'tag',
         };

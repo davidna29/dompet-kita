@@ -1,9 +1,9 @@
 # Aplikasi Keuangan Keluarga (Hermes + Hostinger) — Product Requirements Document
 
-**Status:** Draft, menunggu persetujuan Hermes (STB)
-**Versi:** 0.3
+**Status:** Disetujui (Bagian 18), Tahap 2b berjalan
+**Versi:** 0.4
 **Owner:** TBD
-**Terakhir diperbarui:** 2026-11-02
+**Terakhir diperbarui:** 2026-11-06
 **Kesiapan:** Implementation-ready Tahap 1 (Bagian 18 disetujui Hermes 2026-11-02)
 
 Legenda label: **[Konfirmasi]** = berasal dari dokumen "Pola Sinkron" atau pernyataan pengguna. **[Asumsi]** = asumsi penyusun, mohon dikoreksi. **[Usulan]** = rekomendasi penyusun, perlu keputusan.
@@ -14,7 +14,7 @@ Legenda label: **[Konfirmasi]** = berasal dari dokumen "Pola Sinkron" atau perny
 
 | Keputusan | Isi |
 |---|---|
-| Cakupan | Semua fitur Must dan semua fitur Should masuk cakupan (FR-001 sampai FR-020); Could ditunda |
+| Cakupan | Semua fitur Must dan semua fitur Should masuk cakupan (FR-001 sampai FR-020); Tahap 2b menambah kantong bertipe dan FR-023 hutang/piutang; Could lain ditunda |
 | Tahap rilis | Tahap 1 = semua Must, lalu deploy; Tahap 2 = semua Should |
 | Saldo per kantong | Diperlukan; kantong awal Tunai, BSI, Shopee; tambah kolom `kantong_tujuan` (menunggu persetujuan Hermes) |
 | Selisih saldo | Pilihan C: hanya ditampilkan, tidak dicatat otomatis |
@@ -72,10 +72,10 @@ Nilai yang diharapkan: satu sumber data yang konsisten, bisa diedit lewat dua ja
 **Tahap 1: Must (FR-001 sampai FR-010)**
 Login UI, daftar transaksi dengan filter, tambah/edit/hapus (soft), API untuk STB, ringkasan periode (Mutasi dikecualikan dan ditampilkan terpisah), migrasi 19 baris, sinkron STB, penyelesaian konflik.
 
-**Tahap 2: Should (FR-011 sampai FR-020)**
-Ekspor CSV, pull sesuai permintaan, dashboard grafik, anggaran per kategori, transaksi berulang dan pengingat tagihan, ikon/warna kategori, riwayat perubahan, peringatan dan ringkasan pintar lewat Hermes, PWA + mode gelap, saldo per kantong.
+**Tahap 2: Should (FR-011 sampai FR-020, ditambah FR-023 pada Tahap 2b)**
+Ekspor CSV, pull sesuai permintaan, dashboard grafik, anggaran per kategori, transaksi berulang dan pengingat tagihan, ikon/warna kategori, riwayat perubahan, peringatan dan ringkasan pintar lewat Hermes, PWA + mode gelap, saldo per kantong, hutang dan piutang (FR-023, Tahap 2b).
 
-**Could / nanti:** target tabungan (FR-021), hutang dan piutang (FR-023), kalender, pencarian teks, tag (FR-024), laporan PDF/Excel (FR-025).
+**Could / nanti:** target tabungan (FR-021), kalender, pencarian teks, tag (FR-024), laporan PDF/Excel (FR-025). FR-023 hutang/piutang naik ke Should pada v0.4.
 
 **Won't (saat ini):** lampiran foto struk (FR-022), hapus permanen dari UI, offline-first, websocket, penambahan nilai `jenis` baru.
 
@@ -156,6 +156,8 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 
 **FR-020 Saldo per kantong.** Lihat Bagian 7B.
 
+**FR-023 Hutang dan piutang (Tahap 2b).** Catatan pinjaman keluarga berisi pihak (maks 50), jenis `hutang`/`piutang`, nominal, sisa, tanggal, jatuh tempo opsional, status `belum`/`lunas`, dan keterangan. Membuat catatan **tidak** membuat transaksi. Pembayaran atau penerimaan dicatat lewat konfirmasi dan baru saat itu membuat transaksi: bayar hutang = `jenis=keluar` + `kategori=Hutang`, terima piutang = `jenis=masuk` + `kategori=Piutang`. Kunci idempoten `HUTANG-<id>-<YYYYMMDD>-<jumlah>`; konfirmasi ulang tidak mengurangi sisa dua kali. `sisa` berkurang sampai 0 lalu status menjadi `lunas`. Transaksi Hutang/Piutang **tidak** dihitung sebagai belanja atau pemasukan rumah tangga, tetapi tetap mengubah saldo kantong. Hapus selalu soft delete; transaksi pembayaran tidak ikut dihapus. Endpoint: `GET /api/hutang`, `POST /api/hutang`, `POST /api/hutang/{id}/bayar`, `DELETE /api/hutang/{id}`.
+
 ### Addendum kemampuan UI keluarga (disetujui 2026-11-02)
 
 - **Kelola kantong:** pengguna dapat membuat dan mengganti nama kantong. Rename memperbarui referensi `metode` dan `kantong_tujuan` di semua transaksi (termasuk soft-deleted) dan jadwal berulang dalam satu transaksi database; setiap transaksi yang berubah tetap mendapat riwayat dan `updated_at` server. Arsip adalah soft delete, hanya diizinkan bila saldo saat ini nol dan tidak ada jadwal aktif. Kantong arsip dapat dipulihkan; transaksi dan referensi historis tidak dihapus permanen.
@@ -164,7 +166,7 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 - **Kelola akun:** kolom internal `users.is_admin` membedakan pengelola UI dari anggota dan tidak muncul pada payload STB. Akun awal David dan Nurul adalah admin; admin dapat membuat akun anggota dengan email unik dan kata sandi awal. Anggota baru tidak dapat membuat akun lain.
 - **Navigasi UI:** preferensi tema terang/gelap harus tetap sama setelah navigasi Livewire; toast sukses/gagal dapat ditutup dan tetap bekerja setelah redirect navigasi.
 - **Semantik sinkron API:** DELETE berulang pada baris yang sudah soft-delete mengembalikan baris terhapus yang sama. PUT tanpa perubahan tidak menggeser `updated_at`. PUT pada baris soft-deleted tetap tidak memulihkannya; belum ada endpoint restore.
-- **API anggaran baca/tulis:** `GET /api/anggaran` menyajikan snapshot periode; `POST /api/anggaran` melakukan upsert idempoten per `periode` + `kategori` (`null` = total bulanan); `DELETE /api/anggaran/{id}` adalah soft delete idempoten; `POST /api/anggaran/salin` menyalin periode sebelumnya. Kategori dinormalisasi title case dan `Mutasi` ditolak. Hermes hanya menghapus anggaran setelah instruksi eksplisit pengguna, dan pemakaian anggaran tetap mengecualikan Mutasi serta pemasukan.
+- **API anggaran baca/tulis:** `GET /api/anggaran` menyajikan snapshot periode; `POST /api/anggaran` melakukan upsert idempoten per `periode` + `kategori` (`null` = total bulanan); `DELETE /api/anggaran/{id}` adalah soft delete idempoten; `POST /api/anggaran/salin` menyalin periode sebelumnya. Kategori dinormalisasi title case; `Mutasi`, `Hutang`, dan `Piutang` ditolak karena bukan belanja. Hermes hanya menghapus anggaran setelah instruksi eksplisit pengguna, dan pemakaian anggaran tetap mengecualikan Mutasi serta pemasukan.
 - **API kategori read-only:** `GET /api/kategori` menggabungkan kategori transaksi dan `kategori_meta` aktif, termasuk fallback ikon/warna/urutan, jumlah pemakaian masuk/keluar, dan penanda Mutasi. Tidak ada endpoint tulis; meta kategori tetap dikelola dari UI.
 - **API transaksi berulang baca/tulis:** `GET /api/pengingat` default hanya jadwal aktif (`semua=1` menampilkan nonaktif), `POST /api/pengingat`, `PUT /api/pengingat/{id}`, `DELETE /api/pengingat/{id}` soft delete idempoten, dan konfirmasi yang sudah ada. `client_key` unik nullable pada `transaksi_berulang` membuat POST idempoten; `client_key` tidak dapat diubah lewat PUT. Hermes tidak menghidupkan jadwal soft-deleted secara otomatis.
 
@@ -189,6 +191,7 @@ Sebelum laporan terjadwal, Hermes `GET /api/transaksi?since=<terakhir>`, memperb
 | FR-018 | Peringatan + ringkasan pintar | 2 | Memakai FR-014, FR-015 | Pesan Telegram tambahan |
 | FR-019 | PWA + mode gelap | 2 | Tidak ada | Tidak ada |
 | FR-020 | Saldo per kantong | 2 (kolom sejak 1) | `kantong`, kolom `kantong_tujuan` | Perlu persetujuan skema |
+| FR-023 | Hutang dan piutang | 2b | `hutang_piutang`; `GET/POST /api/hutang`, `POST /api/hutang/{id}/bayar`, `DELETE /api/hutang/{id}` | Hermes dapat membaca dan mencatat pembayaran; transaksi memakai kategori `Hutang`/`Piutang` |
 
 Tabel `transaksi` dan aturan nilai di Bagian 9 tidak berubah, kecuali satu kolom opsional `kantong_tujuan` (Bagian 7B). Tabel tambahan memakai konvensi yang sama (jumlah INT digit polos, WIB, soft delete). `transaksi_berulang` mendapat kolom opsional `client_key` VARCHAR(64) UNIQUE NULL untuk idempotensi pembuatan jadwal dari Hermes.
 
@@ -273,7 +276,7 @@ Tabel `transaksi` (MySQL, utf8mb4) [Konfirmasi; satu kolom tambahan diusulkan]:
 
 **Aturan yang tidak boleh diubah [Konfirmasi]**
 1. `jenis` hanya masuk/keluar; Mutasi = `jenis=keluar` + `kategori=Mutasi`.
-2. Semua total belanja/pengeluaran mengecualikan Mutasi; Mutasi ditampilkan terpisah.
+2. Semua total belanja/pengeluaran mengecualikan Mutasi, Hutang, dan Piutang; ketiganya ditampilkan terpisah. Saldo kantong tetap memasukkan semua transaksi.
 3. `jumlah` selalu bilangan bulat positif; tanda ditentukan `jenis`.
 4. Tanggal Telegram tanpa tahun = tahun berjalan; tanpa tanggal = hari ini (WIB).
 5. `pencatat` default dari pengirim: chat David = David NA, chat Nurul = Nurul Azizah.
@@ -341,7 +344,7 @@ Tanpa baseline atau target dari pengguna; semuanya **[Usulan, TBD]**:
 
 **Tahap 1 (Must):** semua fitur FR-001 sampai FR-010. Setelah selesai, pengguna men-deploy sendiri ke Hostinger lewat SSH, menjalankan migrasi 19 baris, lalu memakai paralel dengan CSV beberapa hari (durasi: TBD).
 
-**Tahap 2 (Should):** FR-011 sampai FR-020, dirilis bertahap. Urutan **[Usulan]**: FR-020 saldo kantong, FR-013 dashboard, FR-016 kategori, FR-017 riwayat, FR-014 anggaran, FR-015 pengingat, FR-018 notifikasi Hermes, FR-012 pull sesuai permintaan, FR-011 ekspor, FR-019 PWA.
+**Tahap 2 (Should):** FR-011 sampai FR-020, dirilis bertahap. **Tahap 2b:** kantong bertipe (harian/tabungan/investasi) dan FR-023 hutang/piutang. Urutan **[Usulan]**: FR-020 saldo kantong, FR-013 dashboard, FR-016 kategori, FR-017 riwayat, FR-014 anggaran, FR-015 pengingat, FR-018 notifikasi Hermes, FR-012 pull sesuai permintaan, FR-011 ekspor, FR-019 PWA.
 
 **Disarankan sejak Tahap 1 [Usulan]:** kolom `kantong_tujuan` ada di migrasi pertama dan API sudah menerimanya, serta perubahan transaksi sudah dicatat ke `transaksi_riwayat`, agar data Mutasi dan riwayat sejak hari pertama tidak perlu dilengkapi ulang.
 
@@ -374,6 +377,7 @@ Cacat pemblokir rilis: kehilangan data, duplikasi, total pengeluaran salah (term
 | 2026-11-02 | Selisih saldo pilihan C; kantong awal Tunai, BSI, Shopee; mobile-first | Jawaban pengguna |
 | 2026-11-02 | v0.2: semua Should masuk cakupan, rilis dua tahap, pembangun opencode + GitHub, Bagian 18 dan 19, dijadikan prd.md | Jawaban pengguna |
 | 2026-11-02 | v0.3: 6 butir fit-Hermes ditempel (pencatat dipatok, normalisasi kategori, format since/server_time, header CSV 8 kolom, kontrak 422, saldo awal wajib); Bagian 18 disetujui Hermes | Hermes (STB) |
+| 2026-11-06 | v0.4: kantong bertipe (`harian`/`tabungan`/`investasi`) dan FR-023 hutang/piutang naik ke Should (Tahap 2b); Hutang/Piutang dikecualikan dari total belanja dan pemasukan | Permintaan pengguna |
 
 ## 17. Glosarium
 
@@ -405,6 +409,7 @@ Mohon Hermes menyetujui, menolak, atau mengusulkan perubahan untuk setiap butir.
 | 10 | Laporan berkala memuat saldo per kantong dari `GET /api/kantong`; total belanja tetap mengecualikan Mutasi | Setuju | Saldo dihitung server, bukan dari CSV |
 | 11 | Penanda "data mungkin belum terbaru" pada laporan bila pull gagal | Setuju | Tanpa catatan |
 | 12 | `ADMIN_TOKEN` tetap terpisah dari token UI, minimal 32 karakter acak, diganti lewat terminal STB bila bocor | Setuju | Tanpa catatan |
+| 13 | Hutang/piutang (FR-023): catatan tidak langsung membuat transaksi; pembayaran mengirim `kategori=Hutang`/`Piutang` dan `client_key=HUTANG-<id>-<YYYYMMDD>-<jumlah>`; keduanya tidak dihitung sebagai belanja/pemasukan | Setuju prinsip | Detail field dicek saat API jadi |
 
 ## 19. Panduan implementasi untuk agen pengembang (opencode) [Usulan]
 

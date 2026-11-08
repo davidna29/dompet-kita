@@ -137,7 +137,7 @@ class BerulangController extends Controller
     private function kategori(): Collection
     {
         return Transaksi::query()
-            ->where('kategori', '!=', 'Mutasi')
+            ->whereNotIn('kategori', Transaksi::KATEGORI_TRANSFER)
             ->distinct()
             ->orderBy('kategori')
             ->pluck('kategori')

@@ -12,6 +12,7 @@
     $navLain = [
         ['route' => 'anggaran.index', 'label' => 'Anggaran', 'ikon' => 'target', 'aktif' => request()->routeIs('anggaran.*')],
         ['route' => 'berulang.index', 'label' => 'Berulang', 'ikon' => 'repeat', 'aktif' => request()->routeIs('berulang.*')],
+        ['route' => 'hutang.index', 'label' => 'Hutang', 'ikon' => 'arrow-down-left', 'aktif' => request()->routeIs('hutang.*')],
         ['route' => 'kategori.index', 'label' => 'Kategori', 'ikon' => 'tag', 'aktif' => request()->routeIs('kategori.*')],
         ['route' => 'pengaturan', 'label' => 'Pengaturan', 'ikon' => 'settings', 'aktif' => request()->routeIs('pengaturan')],
     ];

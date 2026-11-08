@@ -25,7 +25,7 @@ class KantongController extends Controller
             ->unique()
             ->values();
 
-        $kantong = $saldoService->semua()->map(function (array $baris) use ($jadwalAktif) {
+        $kantongSemua = $saldoService->semua()->map(function (array $baris) use ($jadwalAktif) {
             $baris['alasan_arsip'] = $baris['saldo'] !== 0
                 ? 'Saldo harus nol sebelum kantong diarsipkan.'
                 : ($jadwalAktif->contains($baris['nama'])
@@ -34,6 +34,16 @@ class KantongController extends Controller
 
             return $baris;
         });
+
+        $filterTipe = $request->query('tipe');
+        if (! in_array($filterTipe, ['harian', 'tabungan', 'investasi'], true)) {
+            $filterTipe = null;
+        }
+
+        $kantong = $filterTipe === null
+            ? $kantongSemua
+            : $kantongSemua->where('tipe', $filterTipe)->values();
+
         $arsip = $saldoService->arsip();
         $namaKantong = Kantong::withTrashed()->pluck('nama')->all();
 
@@ -47,11 +57,14 @@ class KantongController extends Controller
 
         return view('kantong', [
             'kantong' => $kantong,
+            'kantongSemua' => $kantongSemua,
             'arsip' => $arsip,
             'mutasi' => $saldoService->mutasiTerbaru(8),
             'tanpaKantong' => $saldoService->tanpaKantong(),
             'metodeTidakTerdaftar' => $metodeTidakTerdaftar,
             'total' => $kantong->sum('saldo'),
+            'totalTipe' => $saldoService->totalByTipe($kantongSemua),
+            'filterTipe' => $filterTipe,
             'rekonsiliasi' => session('rekonsiliasi'),
         ]);
     }
@@ -67,6 +80,7 @@ class KantongController extends Controller
 
         $data = $request->validate([
             'nama' => ['required', 'string', 'max:30', Rule::unique('kantong', 'nama')],
+            'tipe' => ['nullable', Rule::in(KantongService::TIPE)],
             'saldo_awal' => ['required', 'string', 'max:30'],
             'tanggal_saldo_awal' => ['required', 'date_format:Y-m-d'],
         ], [
@@ -82,6 +96,7 @@ class KantongController extends Controller
 
         Kantong::create([
             'nama' => trim($data['nama']),
+            'tipe' => $data['tipe'] ?? 'harian',
             'saldo_awal' => $saldoAwal,
             'tanggal_saldo_awal' => $data['tanggal_saldo_awal'],
             'urutan' => ((int) Kantong::withTrashed()->max('urutan')) + 1,
@@ -103,15 +118,20 @@ class KantongController extends Controller
 
         $data = $request->validate([
             'nama' => ['required', 'string', 'max:30', Rule::unique('kantong', 'nama')->ignore($kantong->id)],
+            'tipe' => ['nullable', Rule::in(KantongService::TIPE)],
         ], [
             'nama.unique' => 'Nama kantong sudah digunakan atau masih dimiliki kantong arsip. Pulihkan kantong tersebut atau pilih nama lain.',
         ]);
 
         $service->gantiNama($kantong, trim($data['nama']), $request->user());
 
+        if (isset($data['tipe'])) {
+            $service->ubahTipe($kantong, $data['tipe']);
+        }
+
         return redirect()
             ->route('kantong')
-            ->with('sukses', 'Nama kantong dan referensi terkait diperbarui.');
+            ->with('sukses', 'Nama dan tipe kantong serta referensi terkait diperbarui.');
     }
 
     public function destroy(Kantong $kantong, KantongService $service): RedirectResponse

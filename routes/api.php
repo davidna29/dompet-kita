@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AnggaranApiController;
 use App\Http\Controllers\Api\HealthController;
+use App\Http\Controllers\Api\HutangApiController;
 use App\Http\Controllers\Api\KantongApiController;
 use App\Http\Controllers\Api\KategoriApiController;
 use App\Http\Controllers\Api\PengingatApiController;
@@ -30,4 +31,9 @@ Route::middleware('admin.token')->group(function () {
     Route::delete('/pengingat/{pengingat}', [PengingatApiController::class, 'destroy'])->name('api.pengingat.destroy');
     Route::post('/pengingat/{pengingat}/konfirmasi', [PengingatApiController::class, 'konfirmasi'])
         ->name('api.pengingat.konfirmasi');
+
+    Route::get('/hutang', [HutangApiController::class, 'index'])->name('api.hutang.index');
+    Route::post('/hutang', [HutangApiController::class, 'store'])->name('api.hutang.store');
+    Route::post('/hutang/{hutang}/bayar', [HutangApiController::class, 'bayar'])->name('api.hutang.bayar');
+    Route::delete('/hutang/{hutang}', [HutangApiController::class, 'destroy'])->name('api.hutang.destroy');
 });

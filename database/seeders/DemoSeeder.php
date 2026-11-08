@@ -35,9 +35,9 @@ class DemoSeeder extends Seeder
 
         $mulai = today()->startOfMonth()->subMonths(5);
         $kantong = [
-            ['nama' => 'Tunai', 'saldo_awal' => 1_250_000, 'tanggal_saldo_awal' => $mulai->toDateString(), 'urutan' => 1],
-            ['nama' => 'BSI', 'saldo_awal' => 4_750_000, 'tanggal_saldo_awal' => $mulai->toDateString(), 'urutan' => 2],
-            ['nama' => 'Shopee', 'saldo_awal' => 3_500_000, 'tanggal_saldo_awal' => $mulai->toDateString(), 'urutan' => 3],
+            ['nama' => 'Tunai', 'tipe' => 'harian', 'saldo_awal' => 1_250_000, 'tanggal_saldo_awal' => $mulai->toDateString(), 'urutan' => 1],
+            ['nama' => 'BSI', 'tipe' => 'harian', 'saldo_awal' => 4_750_000, 'tanggal_saldo_awal' => $mulai->toDateString(), 'urutan' => 2],
+            ['nama' => 'Shopee', 'tipe' => 'harian', 'saldo_awal' => 3_500_000, 'tanggal_saldo_awal' => $mulai->toDateString(), 'urutan' => 3],
         ];
 
         foreach ($kantong as $data) {
@@ -57,6 +57,8 @@ class DemoSeeder extends Seeder
             'Mutasi' => ['ikon' => 'repeat', 'warna' => '#87570F', 'urutan' => 10],
             'Gaji' => ['ikon' => 'bank', 'warna' => '#4F6B4A', 'urutan' => 11],
             'Proyek' => ['ikon' => 'sparkles', 'warna' => '#496976', 'urutan' => 12],
+            'Hutang' => ['ikon' => 'arrow-down-left', 'warna' => '#8E5F66', 'urutan' => 13],
+            'Piutang' => ['ikon' => 'arrow-up-right', 'warna' => '#657A5E', 'urutan' => 14],
         ];
 
         foreach ($meta as $kategori => $data) {

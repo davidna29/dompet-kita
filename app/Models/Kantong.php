@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -13,6 +14,7 @@ class Kantong extends Model
 
     protected $fillable = [
         'nama',
+        'tipe',
         'saldo_awal',
         'tanggal_saldo_awal',
         'urutan',
@@ -21,6 +23,7 @@ class Kantong extends Model
     protected function casts(): array
     {
         return [
+            'tipe' => 'string',
             'saldo_awal' => 'integer',
             'tanggal_saldo_awal' => 'date',
             'urutan' => 'integer',
@@ -31,6 +34,6 @@ class Kantong extends Model
     {
         $this->attributes['tanggal_saldo_awal'] = $nilai instanceof \DateTimeInterface
             ? $nilai->format('Y-m-d')
-            : \Carbon\Carbon::parse((string) $nilai)->toDateString();
+            : Carbon::parse((string) $nilai)->toDateString();
     }
 }
