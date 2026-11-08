@@ -1,21 +1,20 @@
 # AI Handoff — Dompet Kita
 
-Last updated: 2026-11-06
+Last updated: 2026-11-08
 
 ## Repository and current state
 
 - Repo: `https://github.com/davidna29/dompet-kita`
-- Base branch: `main` at `9dfc31b docs: sync AI handoff with latest API commits`.
-- Active branch: `feat/kantong-tipe-hutang` — pocket types and debts/receivables (FR-023). Committed and pushed; pull request: https://github.com/davidna29/dompet-kita/pull/1
-- Commits on the branch: `232bdb0` core schema/services, `dec106b` UI, `4e78e30` docs/PRD v0.4.
-- `main` includes budget read/write, `GET /api/kategori`, and recurring CRUD with `transaksi_berulang.client_key` (`9a43f62`).
+- Branch: `main` at `a108dd1 feat: kantong bertipe + hutang-piutang (FR-023) (#1)`.
+- Pocket types and debts/receivables (FR-023) were merged through PR #1 (squash commit `a108dd1`); the `feat/kantong-tipe-hutang` branch was deleted locally and remotely. Source commits: `232bdb0` core, `dec106b` UI, `4e78e30` docs/PRD v0.4, `960c439` handoff.
+- `main` also includes budget read/write, `GET /api/kategori`, and recurring CRUD with `transaksi_berulang.client_key` (`9a43f62`).
 - `docs/fitur-hutang-kantong.md` is the user-supplied implementation prompt for this branch and is now tracked in the repo.
 - `docs/rangkuman-perbaikan-dompet-kita.md` was supplied by the user and read as the Hermes audit source. Its text was preserved while the agreed findings were applied to the app.
 - Preserve the Pink Linen, account, wallet, API, animation, and documentation work summarized below.
 
 ## Implemented
 
-### Pocket types and debts/receivables (branch `feat/kantong-tipe-hutang`)
+### Pocket types and debts/receivables (merged in `a108dd1`)
 
 - `kantong.tipe` is a plain string restricted by validation to `harian`, `tabungan`, `investasi` (not a MySQL ENUM, so SQLite tests stay compatible). The migration defaults existing rows to `harian`. `GET /api/kantong` now includes `tipe`; `SaldoService::totalByTipe()` groups balances.
 - The Kantong UI shows a type badge, a type filter, and three totals (harian/tabungan/investasi). Create/edit accepts `tipe`; rename/archive behaviour is unchanged.
@@ -73,7 +72,7 @@ Last updated: 2026-11-06
 
 ## Pending / before release
 
-0. **PR #1 (`feat/kantong-tipe-hutang`) is open and needs review/merge.** Visual QA for the new Hutang pages and the Kantong type filter/badges is pending on desktop and 360 px, light/dark and both palettes.
+0. **Visual QA for the merged pocket-type and Hutang work is pending:** Hutang pages and the Kantong type filter/badges on desktop and 360 px, light/dark and both palettes.
 1. **Visual QA is still pending for this motion pass:** inspect desktop and 360 px, both light/dark and Olive/Pink Linen, toast close/auto-dismiss, dialog/disclosure, loading, hover/focus, and Reduce Motion; check console and horizontal overflow. The existing Chrome window was on a `Tambah jadwal` form, so it was left untouched rather than navigated away. Check with the user or use a separate safe browser context.
 2. **Hostinger API auth is still unresolved:** `/api/health` returns 401. Rotate the exposed `ADMIN_TOKEN`, refresh `config:cache`, confirm the Authorization header reaches PHP, and confirm `index.php` serves the same app instance as Tinker. The budget, category, recurring, and hutang APIs cannot be used by Hermes until this passes.
 3. Run `php artisan migrate --force` on Hostinger for `transaksi_berulang.client_key`, `kantong.tipe`, and `hutang_piutang` before using the recurring and hutang features.
